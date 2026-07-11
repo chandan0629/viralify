@@ -90,3 +90,25 @@
   gap: 15px;
   margin-top: 10px;
 }
+
+@media (max-width: 768px) {
+  .record-area {
+    padding: 30px 15px;
+  }
+  .record-icon {
+    font-size: 3rem;
+  }
+  .timer {
+    font-size: 2.2rem;
+  }
+  .action-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+  .action-buttons .btn {
+    width: 100%;
+  }
+  .audio-preview audio {
+    width: 100%;
+  }
+}
