@@ -723,6 +723,9 @@ class SongHitPredictor:
 
         # Get optimal ranges
         optimal_ranges = self.get_optimal_ranges()
+        if not optimal_ranges:
+            return []
+            
         suggestions = []
 
         # Only suggest features that our DSP mutator can physically change
