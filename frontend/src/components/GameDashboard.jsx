@@ -1,8 +1,10 @@
 import React, { useState } from 'react'
 
+import { formatTrackName } from '../utils/formatters'
+
 function Badge({name, unlocked}){
   return (
-    <div className={"badge " + (unlocked? 'unlocked':'locked')}>
+    <div className={"badge " + (unlocked? 'unlocked':'locked')} style={!unlocked ? { filter: 'grayscale(100%)', opacity: 0.4 } : {}}>
       <div className="badge-emoji">{unlocked? '🏆':'🔒'}</div>
       <div className="badge-name">{name}</div>
     </div>
@@ -23,8 +25,8 @@ export default function GameDashboard({score, logs}){
   const displayLogs = showAllAttempts ? logs : logs.slice(0, 5)
 
   return (
-    <aside className="card compact-hub">
-      <h2>🎮 Player Hub</h2>
+    <aside className="card compact-hub" style={{ opacity: 0.9, transform: 'scale(0.98)', boxShadow: '0 4px 15px rgba(0,0,0,0.2)' }}>
+      <h2 style={{ fontSize: '1.2rem', color: 'var(--text-secondary)' }}>🎮 Player Hub</h2>
       <div className="score">Score: <strong>{score}</strong></div>
 
       <div className="badges compact">
@@ -48,11 +50,11 @@ export default function GameDashboard({score, logs}){
             {displayLogs.map((l,idx)=>(
               <li key={idx} className="attempt-log">
                 <div className="song-info">
-                  <div className="song-name">♪ {l.songName || 'Untitled'}</div>
+                  <div className="song-name" title={l.songName}>♪ {formatTrackName(l.songName)}</div>
                   <div className="song-score"><strong>{(l.probability*100).toFixed(0)}%</strong></div>
                 </div>
                 <div className="attempt-points">
-                  <span className="points">+{l.points}</span>
+                  <span className="points">+{l.points} XP</span>
                 </div>
               </li>
             ))}

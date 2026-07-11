@@ -1,8 +1,11 @@
 import React, { useState } from 'react'
-import { AudioWaveform } from 'lucide-react'
+import { GoogleLogin, useGoogleLogin } from '@react-oauth/google'
+import { jwtDecode } from 'jwt-decode'
 import './Auth.css'
 
-export default function Signup({ onSignup, onSwitchToLogin, isDarkMode, onToggleTheme, onBack }) {
+const BACKEND_URL = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? '' : 'http://localhost:5000');
+
+export default function Signup({ onSignup, onSwitchToLogin, isDarkMode, onToggleTheme }) {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -11,8 +14,6 @@ export default function Signup({ onSignup, onSwitchToLogin, isDarkMode, onToggle
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-
-  const BACKEND_URL = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? '' : 'http://localhost:5005')
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -25,175 +26,135 @@ export default function Signup({ onSignup, onSwitchToLogin, isDarkMode, onToggle
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (formData.password !== formData.confirmPassword) {
+       setError("Passwords do not match");
+       return;
+    }
     setLoading(true)
     setError('')
-
-    if (!formData.username || !formData.email || !formData.password || !formData.confirmPassword) {
-      setError('Please fill in all fields')
-      setLoading(false)
-      return
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match')
-      setLoading(false)
-      return
-    }
 
     try {
       const response = await fetch(`${BACKEND_URL}/api/create-new-user`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          username: formData.username,
-          email: formData.email,
-          password: formData.password
+           username: formData.username,
+           email: formData.email,
+           password: formData.password
         })
-      })
-
-      const data = await response.json()
-
+      });
+      const data = await response.json();
+      
       if (!response.ok) {
-        throw new Error(data.error || 'Registration failed')
+        throw new Error(data.error || 'Signup failed');
       }
-
-      if (onSignup) {
-        onSignup(data.user)
-      }
+      
+      if (onSignup) onSignup(data.user);
     } catch (err) {
-      setError(err.message || 'Registration failed. Please try again.')
+      setError(err.message)
     } finally {
       setLoading(false)
     }
   }
 
+  const handleGoogleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      setLoading(true);
+      setError('');
+      try {
+        const userInfo = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+        }).then(res => res.json());
+        
+        const response = await fetch(`${BACKEND_URL}/api/google-login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: userInfo.email,
+            name: userInfo.name,
+            google_id: userInfo.sub
+          })
+        });
+        
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Google login failed');
+        
+        if (onSignup) onSignup(data.user);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    },
+    onError: () => setError('Google sign in failed')
+  });
+
   return (
-    <div className={`auth-container ${isDarkMode ? 'dark-theme' : 'light-theme'}`}>
-      <div style={{ position: 'absolute', top: '30px', left: '40px', zIndex: 100 }}>
-        <button onClick={onBack} style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', padding: '8px 16px', borderRadius: '8px', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500' }}>
-          ← Back
+    <div className="clean-form-container">
+      <h2>Create account</h2>
+      <p className="subtitle">Let's get started with your 30 days trial</p>
+
+      {error && <div className="error-message" style={{color: 'red', marginBottom: '1rem'}}>{error}</div>}
+
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          name="username"
+          placeholder="Name"
+          value={formData.username}
+          onChange={handleChange}
+          required
+          className="clean-input"
+        />
+
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={formData.email}
+          onChange={handleChange}
+          required
+          className="clean-input"
+        />
+
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          value={formData.password}
+          onChange={handleChange}
+          required
+          className="clean-input"
+        />
+
+        <input
+          type="password"
+          name="confirmPassword"
+          placeholder="Confirm Password"
+          value={formData.confirmPassword}
+          onChange={handleChange}
+          required
+          className="clean-input"
+        />
+
+        <button type="submit" disabled={loading} className="clean-button">
+          {loading ? 'Creating account...' : 'Create account'}
         </button>
+      </form>
+
+      <div className="login-link-text">
+        Already have an account? <span onClick={onSwitchToLogin}>Login</span>
       </div>
 
-      <div className="auth-background">
-        <div className="music-symbol">♪</div>
-        <div className="dna-helix"></div>
-        <div className="floating-notes">
-          <div className="note" style={{'--x': '10%', '--duration': '8s'}}>♫</div>
-          <div className="note" style={{'--x': '20%', '--duration': '12s'}}>♪</div>
-          <div className="note" style={{'--x': '80%', '--duration': '10s'}}>♬</div>
-          <div className="note" style={{'--x': '90%', '--duration': '14s'}}>♩</div>
+      <div className="social-login-row">
+        <div className="social-btn" onClick={() => handleGoogleLogin()}>
+          <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google" />
         </div>
-        <div className="gradient-orbs">
-          <div className="orb orb-1"></div>
-          <div className="orb orb-2"></div>
+        <div className="social-btn">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" alt="Apple" />
         </div>
-      </div>
-
-      <div className="auth-content">
-        <div className="auth-card">
-          <div className="auth-header">
-            <div className="header-top" style={{ position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <div className="logo" onClick={onBack} style={{cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px'}}>
-                <AudioWaveform size={32} color="#EC4899" />
-                <h1 style={{ margin: 0, fontSize: '1.8rem' }}>Viralify</h1>
-              </div>
-              <button className="theme-toggle" onClick={onToggleTheme} title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'} style={{ position: 'absolute', right: 0 }}>
-                <div className={`toggle-slider ${isDarkMode ? 'dark' : 'light'}`}>
-                  <div className="toggle-icon">
-                    {isDarkMode ? '🌙' : '☀️'}
-                  </div>
-                </div>
-              </button>
-            </div>
-            <h2>Create Account</h2>
-            <p>Join Viralify to discover your next viral hit</p>
-          </div>
-          
-          {error && (
-            <div className="error-message">
-              <span className="error-icon">⚠️</span>
-              {error}
-            </div>
-          )}
-          
-          <form className="auth-form" onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label htmlFor="username">Username <span className="required">*</span></label>
-              <input
-                id="username"
-                name="username"
-                type="text"
-                placeholder="Choose a username"
-                value={formData.username}
-                onChange={handleChange}
-                required
-                disabled={loading}
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="email">Email <span className="required">*</span></label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="Enter your email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                disabled={loading}
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="password">Password <span className="required">*</span></label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                placeholder="Create a password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-                disabled={loading}
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="confirmPassword">Confirm Password <span className="required">*</span></label>
-              <input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                placeholder="Confirm your password"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                required
-                disabled={loading}
-              />
-            </div>
-            
-            <button
-              type="submit"
-              className="auth-button primary"
-              disabled={loading || !formData.username || !formData.email || !formData.password}
-            >
-              {loading ? <div className="loading-spinner"></div> : 'Create Account'}
-            </button>
-          </form>
-          
-          <div className="auth-footer">
-            <p>
-              Ready to login?{' '}
-              <button 
-                className="switch-auth"
-                onClick={onSwitchToLogin}
-                disabled={loading}
-              >
-                Sign In
-              </button>
-            </p>
-          </div>
+        <div className="social-btn">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook" />
         </div>
       </div>
     </div>

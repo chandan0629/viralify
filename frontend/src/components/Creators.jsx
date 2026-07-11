@@ -83,7 +83,7 @@ export default function Creators() {
     <div className="creators">
       <div className="page-header">
         <h2>👨‍💻 Meet the Creator</h2>
-        <p>Brilliant minds behind Viralify</p>
+        <p>Brilliant minds behind ViraliFy</p>
       </div>
 
       <div className="creators-container">
@@ -166,10 +166,10 @@ export default function Creators() {
 
         {/* About Project */}
         <section className="about-section">
-          <h3 className="section-title">About Viralify</h3>
+          <h3 className="section-title">About ViraliFy</h3>
           <div className="about-content">
             <p>
-              <strong>Viralify</strong> is an AI-powered platform that predicts whether a song will go viral
+              <strong>ViraliFy</strong> is an AI-powered platform that predicts whether a song will go viral
               using advanced machine learning algorithms and deep analysis of musical features.
             </p>
             <p>
@@ -177,7 +177,7 @@ export default function Creators() {
               UI, Flask for the API backend, and blockchain integration for Web3 capabilities.
             </p>
             <p>
-              Whether you're a music producer, artist, or music enthusiast, Viralify helps you understand
+              Whether you're a music producer, artist, or music enthusiast, ViraliFy helps you understand
               what makes a song successful and provides actionable recommendations for improvement.
             </p>
             <div className="project-stats">

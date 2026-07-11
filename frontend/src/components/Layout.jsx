@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import { AudioWaveform } from 'lucide-react'
 import './Layout.css'
 
 // Lazy load components to avoid import errors
-const LiveSongTest = React.lazy(() => import('./LiveSongTestIntegrated'))
+const LiveSongTest = React.lazy(() => import('./LiveSongTest'))
 const Recommendations = React.lazy(() => import('./Recommendations'))
+const Creators = React.lazy(() => import('./Creators'))
 const GameDashboard = React.lazy(() => import('./GameDashboard'))
 const LiveRecording = React.lazy(() => import('./LiveRecording'))
-const ModelSettings = React.lazy(() => import('./ModelSettings'))
 
 export default function Layout({ score, logs, onResult, user, onLogout }) {
   const [currentPage, setCurrentPage] = useState('home')
@@ -53,10 +52,11 @@ export default function Layout({ score, logs, onResult, user, onLogout }) {
       </div>
 
       {/* Hamburger Menu */}
-      <button
+      <button 
         className={`hamburger ${menuOpen ? 'active' : ''}`}
         onClick={toggleMenu}
         aria-label="Toggle menu"
+        aria-expanded={menuOpen}
       >
         <span></span>
         <span></span>
@@ -64,7 +64,7 @@ export default function Layout({ score, logs, onResult, user, onLogout }) {
       </button>
 
       {/* Theme Toggle Button */}
-      <button
+      <button 
         className="theme-toggle"
         onClick={toggleTheme}
         aria-label="Toggle theme"
@@ -72,10 +72,17 @@ export default function Layout({ score, logs, onResult, user, onLogout }) {
         <span className="theme-icon">{isDarkTheme ? '☀️' : '🌙'}</span>
       </button>
 
+      {/* Sidebar Backdrop Overlay */}
+      <div 
+        className={`sidebar-backdrop ${menuOpen ? 'open' : ''}`} 
+        onClick={toggleMenu}
+        aria-hidden="true"
+      />
+
       {/* Sidebar Menu */}
       <nav className={`sidebar ${menuOpen ? 'open' : ''}`}>
         <div className="menu-header">
-          <h1>Viralify</h1>
+          <h1>ViraliFy</h1>
           {user && (
             <div className="user-info">
               <div className="user-avatar">
@@ -90,15 +97,16 @@ export default function Layout({ score, logs, onResult, user, onLogout }) {
         </div>
         <ul className="menu-items">
           <li>
-            <button
+            <button 
               className={`menu-link ${currentPage === 'home' ? 'active' : ''}`}
               onClick={() => navigate('home')}
             >
               Home
             </button>
           </li>
+
           <li>
-            <button
+            <button 
               className={`menu-link ${currentPage === 'live' ? 'active' : ''}`}
               onClick={() => navigate('live')}
             >
@@ -106,7 +114,7 @@ export default function Layout({ score, logs, onResult, user, onLogout }) {
             </button>
           </li>
           <li>
-            <button
+            <button 
               className={`menu-link ${currentPage === 'record' ? 'active' : ''}`}
               onClick={() => navigate('record')}
             >
@@ -114,19 +122,19 @@ export default function Layout({ score, logs, onResult, user, onLogout }) {
             </button>
           </li>
           <li>
-            <button
+            <button 
               className={`menu-link ${currentPage === 'recommend' ? 'active' : ''}`}
               onClick={() => navigate('recommend')}
             >
-              Insights
+              Recommendations
             </button>
           </li>
           <li>
-            <button
-              className={`menu-link ${currentPage === 'settings' ? 'active' : ''}`}
-              onClick={() => navigate('settings')}
+            <button 
+              className={`menu-link ${currentPage === 'creators' ? 'active' : ''}`}
+              onClick={() => navigate('creators')}
             >
-              Settings
+              Creators
             </button>
           </li>
         </ul>
@@ -151,10 +159,7 @@ export default function Layout({ score, logs, onResult, user, onLogout }) {
         {currentPage === 'home' && (
           <div className="home-page">
             <div className="welcome-section">
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '20px', marginBottom: '20px' }}>
-                <AudioWaveform size={64} color="#EC4899" />
-                <h1 className="title-3d" style={{ marginBottom: 0 }}>Viralify</h1>
-              </div>
+              <h1 className="title-3d">ViraliFy</h1>
               <p className="subtitle">Predict Your Song's Potential</p>
               <p className="description">
                 Use AI-powered machine learning to analyze your song's potential to go viral.
@@ -166,13 +171,20 @@ export default function Layout({ score, logs, onResult, user, onLogout }) {
                 </button>
               </div>
             </div>
+            <aside className="game-dashboard-container">
+              <React.Suspense fallback={<div>Loading dashboard...</div>}>
+                <GameDashboard score={score} logs={logs} />
+              </React.Suspense>
+            </aside>
           </div>
         )}
+
+
 
         {currentPage === 'live' && (
           <div className="live-page">
             <React.Suspense fallback={<div>Loading...</div>}>
-              <LiveSongTest />
+              <LiveSongTest onResult={onResult} />
             </React.Suspense>
           </div>
         )}
@@ -193,12 +205,10 @@ export default function Layout({ score, logs, onResult, user, onLogout }) {
           </div>
         )}
 
-        {currentPage === 'settings' && (
-          <div className="settings-page">
-            <React.Suspense fallback={<div>Loading...</div>}>
-              <ModelSettings />
-            </React.Suspense>
-          </div>
+        {currentPage === 'creators' && (
+          <React.Suspense fallback={<div>Loading...</div>}>
+            <Creators />
+          </React.Suspense>
         )}
       </main>
 

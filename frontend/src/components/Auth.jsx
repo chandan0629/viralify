@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { GoogleOAuthProvider } from '@react-oauth/google'
 import Login from './Login'
 import Signup from './Signup'
 
@@ -64,25 +65,45 @@ export default function Auth({ onLogin, initialIsLogin = true, onBack }) {
     return null
   }
 
+  const GOOGLE_CLIENT_ID = "627390059882-dnp1bqaj69cvjrfenmbjhm339tsmlion.apps.googleusercontent.com"
+
   return (
-    <>
-      {isLogin ? (
-        <Login 
-          onLogin={handleLogin} 
-          onSwitchToSignup={switchToSignup}
-          isDarkMode={isDarkMode}
-          onToggleTheme={toggleTheme}
-          onBack={onBack}
-        />
-      ) : (
-        <Signup 
-          onSignup={handleSignup} 
-          onSwitchToLogin={switchToLogin}
-          isDarkMode={isDarkMode}
-          onToggleTheme={toggleTheme}
-          onBack={onBack}
-        />
-      )}
-    </>
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+      <div className={`auth-split-wrapper ${isDarkMode ? 'dark-mode' : 'light-mode'}`}>
+        <div className="auth-left-pane">
+          {onBack && (
+            <button onClick={onBack} className="back-btn" style={{ background: 'none', border: 'none', color: isDarkMode ? '#aaa' : '#666', cursor: 'pointer', padding: '10px 0', display: 'flex', alignItems: 'center', gap: '5px' }}>
+              ← Back
+            </button>
+          )}
+          {isLogin ? (
+            <Login 
+              onLogin={handleLogin} 
+              onSwitchToSignup={switchToSignup}
+              isDarkMode={isDarkMode}
+              onToggleTheme={toggleTheme}
+            />
+          ) : (
+            <Signup 
+              onSignup={handleSignup} 
+              onSwitchToLogin={switchToLogin}
+              isDarkMode={isDarkMode}
+              onToggleTheme={toggleTheme}
+            />
+          )}
+        </div>
+        
+        <div className="auth-right-pane" style={{ backgroundImage: "url('/auth-bg.png')" }}>
+          <div className="auth-right-overlay">
+            <h2>ViraliFy</h2>
+            <p>
+              Discover if your next track has what it takes to go viral. 
+              Our advanced machine learning models analyze your audio DNA to predict its success 
+              before you even hit publish.
+            </p>
+          </div>
+        </div>
+      </div>
+    </GoogleOAuthProvider>
   )
 }

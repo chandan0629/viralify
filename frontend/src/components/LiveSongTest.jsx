@@ -1,15 +1,17 @@
 import React, { useState, useRef } from 'react'
+import { jwtDecode } from 'jwt-decode'
+import { formatTrackName } from '../utils/formatters'
 import html2pdf from 'html2pdf.js'
 import ReportTemplate from './ReportTemplate'
-import HookInfoPopover from './HookInfoPopover'
 import './LiveSongTest.css'
 
 // Use relative URL for Vercel (same domain), fallback to localhost for development
-const BACKEND_URL = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? '' : 'http://localhost:5005')
+const BACKEND_URL = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? '' : 'http://localhost:5000')
 
-export default function LiveSongTest() {
+export default function LiveSongTest({ onResult }) {
   const [file, setFile] = useState(null)
   const [uploading, setUploading] = useState(false)
+  const [uploadStep, setUploadStep] = useState(1)
   const [analyzing, setAnalyzing] = useState(false)
   const [analyzingHooks, setAnalyzingHooks] = useState(false)
   const [hookLoadingText, setHookLoadingText] = useState('Mapping beat boundaries...')
@@ -17,28 +19,24 @@ export default function LiveSongTest() {
   const [fileName, setFileName] = useState('')
   const [dragActive, setDragActive] = useState(false)
   const [error, setError] = useState(null)
-  const [pinnedHookIndex, setPinnedHookIndex] = useState(null)
-  const [hoveredHookIndex, setHoveredHookIndex] = useState(null)
+  
+  // Playground state
+  const [showPlayground, setShowPlayground] = useState(false)
+  const [playgroundFeatures, setPlaygroundFeatures] = useState(null)
+  const [playgroundScore, setPlaygroundScore] = useState(null)
+  const [playgroundLoading, setPlaygroundLoading] = useState(false)
+  const [mutatingAudio, setMutatingAudio] = useState(false)
+  const [mutatedAudioUrl, setMutatedAudioUrl] = useState(null)
+  const [playbackTime, setPlaybackTime] = useState(0)
+  const debounceTimerRef = useRef(null)
+
   const reportRef = useRef(null)
   const audioRef = useRef(null)
-
-  const [mutating, setMutating] = useState(false)
-  const [mutatedAudioUrl, setMutatedAudioUrl] = useState(null)
-  const [mutationError, setMutationError] = useState(null)
-  const [activePlayer, setActivePlayer] = useState('after')
-  const originalAudioRef = useRef(null)
-  const mutatedAudioRef = useRef(null)
-  
-  const [playgroundFeatures, setPlaygroundFeatures] = useState(null)
-  const [simulatedProb, setSimulatedProb] = useState(null)
-  const [isSimulating, setIsSimulating] = useState(false)
-  const [debounceTimer, setDebounceTimer] = useState(null)
 
   const audioUrl = React.useMemo(() => {
     return file ? URL.createObjectURL(file) : null;
   }, [file]);
 
-  const activeHookIndex = hoveredHookIndex !== null ? hoveredHookIndex : pinnedHookIndex;
 
   const jumpToHook = (startTime) => {
     if (audioRef.current) {
@@ -82,20 +80,39 @@ export default function LiveSongTest() {
   const handleUploadAndAnalyze = async () => {
     if (!file) return
 
+    if (file.name.toLowerCase().includes('mutated')) {
+      setError("This song appears to be already mutated. Please upload an original track for accurate viral prediction.")
+      return
+    }
+
     setUploading(true)
+    setUploadStep(1)
     setError(null)
     
+    // Animate steps while uploading
+    const step2Timer = setTimeout(() => setUploadStep(2), 800)
+    const step3Timer = setTimeout(() => setUploadStep(3), 1600)
+
     try {
       // Create FormData for file upload
       const formData = new FormData()
       formData.append('file', file)
 
+      // Add 300-second timeout (5 minutes) to account for Render cold starts and slow upload speeds
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(new Error(`Request timed out trying to reach ${BACKEND_URL || 'Vercel'}. Please check if VITE_API_URL is set correctly in Vercel.`)), 300000)
+
       // Upload and analyze with backend
       const response = await fetch(`${BACKEND_URL}/api/analyze-audio`, {
         method: 'POST',
-        body: formData
+        body: formData,
+        signal: controller.signal
       })
+      
+      clearTimeout(timeoutId)
 
+      clearTimeout(step2Timer)
+      clearTimeout(step3Timer)
       setUploading(false)
       
       if (!response.ok) {
@@ -111,16 +128,27 @@ export default function LiveSongTest() {
 
       setResult({
         fileName: prediction.file_name || fileName,
+        hit_probability: prediction.hit_probability,
         viralScore: (prediction.hit_probability * 100).toFixed(1),
-        isViral: prediction.hit_probability > 0.6,
+        isViral: prediction.isViral,
         confidence: (prediction.confidence * 100).toFixed(0),
         prediction: prediction.prediction,
         features: prediction.features || prediction.extracted_features,
         temporalSegments: [], // To be fetched in Phase 2
         topHooks: [], // To be fetched in Phase 2
         totalDurationSec: prediction.total_duration_sec || 180,
-        analysisId: prediction.analysisId
+        analysisId: prediction.analysisId,
+        prescriptions: prediction.prescriptions || []
       })
+
+      if (onResult) {
+        onResult({
+          hit_probability: prediction.hit_probability,
+          confidence: prediction.confidence,
+          features: prediction.features || prediction.extracted_features,
+          songName: prediction.file_name || fileName
+        });
+      }
 
       setAnalyzing(false)
     } catch (err) {
@@ -189,8 +217,117 @@ export default function LiveSongTest() {
     setResult(null)
     setAnalyzing(false)
     setUploading(false)
-    setPinnedHookIndex(null)
-    setHoveredHookIndex(null)
+    setShowPlayground(false)
+  }
+
+  const enterPlayground = () => {
+    setPlaygroundFeatures({ ...result.features })
+    setPlaygroundScore(result.hit_probability)
+    setShowPlayground(true)
+  }
+
+  const scaleScore = (rawScore, originalScore) => {
+    // Safety: if either input is invalid, return rawScore as-is
+    if (rawScore == null || isNaN(rawScore)) return originalScore || 0;
+    if (originalScore == null || isNaN(originalScore)) return rawScore;
+    if (rawScore <= originalScore) return rawScore;
+    const maxGain = 1.0 - originalScore;
+    if (maxGain <= 0) return originalScore; // Already at max
+    const uiMaxGain = maxGain * 0.45; // Cap max UI gain to 45% of what's left
+    const actualGain = rawScore - originalScore;
+    // Logarithmic curve using exponential decay
+    const scaledGain = uiMaxGain * (1 - Math.exp(-2.5 * actualGain / uiMaxGain));
+    return originalScore + scaledGain;
+  };
+
+  const handlePlaygroundChange = (feature, value) => {
+    const newFeatures = { ...playgroundFeatures, [feature]: parseFloat(value) }
+    setPlaygroundFeatures(newFeatures)
+    
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current)
+    setPlaygroundLoading(true)
+    
+    debounceTimerRef.current = setTimeout(async () => {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/predict`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newFeatures)
+        })
+        if (response.ok) {
+          const data = await response.json()
+          
+          setPlaygroundScore(scaleScore(data.hit_probability, result.hit_probability))
+        }
+      } catch (err) {
+        console.error("Playground predict error:", err)
+      } finally {
+        setPlaygroundLoading(false)
+      }
+    }, 400)
+  }
+
+  const applyConsultantTweaks = () => {
+    if (!result || !result.prescriptions) return
+    let newFeatures = { ...playgroundFeatures }
+    result.prescriptions.forEach(rec => {
+      newFeatures[rec.feature] = rec.suggested
+    })
+    setPlaygroundFeatures(newFeatures)
+    
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current)
+    setPlaygroundLoading(true)
+    fetch(`${BACKEND_URL}/api/predict`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newFeatures)
+    }).then(res => res.json()).then(data => {
+      setPlaygroundScore(scaleScore(data.hit_probability, result.hit_probability))
+      setPlaygroundLoading(false)
+    }).catch(() => setPlaygroundLoading(false))
+  }
+
+  const generateMutatedAudio = async () => {
+    if (!result || !result.analysisId) return;
+    
+    setMutatingAudio(true);
+    setError(null);
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/mutate-audio`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          analysisId: result.analysisId,
+          target_tempo: playgroundFeatures.tempo,
+          target_key: playgroundFeatures.key,
+          target_loudness: playgroundFeatures.loudness,
+          target_energy: playgroundFeatures.energy,
+          target_liveness: playgroundFeatures.liveness,
+          target_acousticness: playgroundFeatures.acousticness,
+          original_tempo: result.features.tempo,
+          original_key: result.features.key,
+          original_loudness: result.features.loudness,
+          original_energy: result.features.energy,
+          original_liveness: result.features.liveness,
+          original_acousticness: result.features.acousticness
+        })
+      });
+      
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error || 'Failed to mutate audio');
+      }
+      
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      setMutatedAudioUrl(url);
+      
+    } catch (err) {
+      setError(err.message || 'Error mutating audio');
+      console.error(err);
+    } finally {
+      setMutatingAudio(false);
+    }
   }
 
   const handleDownloadReport = () => {
@@ -281,15 +418,15 @@ export default function LiveSongTest() {
                   <div className="progress-fill upload-progress"></div>
                 </div>
                 <div className="upload-steps">
-                  <div className="step active">
+                  <div className={`step ${uploadStep >= 1 ? 'active' : ''}`}>
                     <div className="step-icon">✓</div>
                     <span>File Received</span>
                   </div>
-                  <div className="step">
+                  <div className={`step ${uploadStep >= 2 ? 'active' : ''}`}>
                     <div className="step-icon">⏳</div>
                     <span>Processing</span>
                   </div>
-                  <div className="step">
+                  <div className={`step ${uploadStep >= 3 ? 'active' : ''}`}>
                     <div className="step-icon">🔍</div>
                     <span>Analyzing</span>
                   </div>
@@ -355,8 +492,8 @@ export default function LiveSongTest() {
           <div className="results-section">
             <div className={`result-card ${result.isViral ? 'viral' : 'not-viral'}`}>
               <div className="result-header">
-                <h3>{result.isViral ? '🚀 Viral Hit!' : '📊 Below Average'}</h3>
-                <p className="song-title">{result.fileName}</p>
+                <h3>{result.isViral ? (result.confidence > 50 ? '🚀 Viral Hit!' : '🚀 Potential Viral Hit') : '📊 Below Average'}</h3>
+                <p className="song-title" title={result.fileName}>{formatTrackName(result.fileName)}</p>
               </div>
 
               <div className="viral-score-section">
@@ -364,7 +501,10 @@ export default function LiveSongTest() {
                   <div className="viral-bar">
                     <div 
                       className="viral-fill"
-                      style={{ width: `${result.viralScore}%` }}
+                      style={{ 
+                        width: `${result.viralScore}%`,
+                        background: result.viralScore >= 75 ? 'linear-gradient(90deg, #1DB954, #1ed760)' : result.viralScore >= 50 ? 'linear-gradient(90deg, #f59e0b, #fbbf24)' : 'linear-gradient(90deg, #ef4444, #f87171)'
+                      }}
                     ></div>
                   </div>
                   <div className="score-display">
@@ -373,9 +513,8 @@ export default function LiveSongTest() {
                   </div>
                 </div>
 
-                <div className="confidence-badge">
-                  <span className="confidence-icon">✓</span>
-                  <span className="confidence-text">{result.confidence}% confidence</span>
+                <div className="confidence-text-note" title="Confidence based on similarity to model training data" style={{ marginTop: '12px', textAlign: 'center' }}>
+                  <small style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>*Model Confidence: {result.confidence}% {result.confidence < 50 ? '(Needs more data)' : ''}</small>
                 </div>
               </div>
               
@@ -450,6 +589,7 @@ export default function LiveSongTest() {
                                 ref={audioRef} 
                                 src={audioUrl} 
                                 controls 
+                                onTimeUpdate={(e) => setPlaybackTime(e.target.currentTime)}
                                 style={{ width: '100%', height: '40px', outline: 'none' }}
                               />
                             </div>
@@ -483,26 +623,13 @@ export default function LiveSongTest() {
                                   {formatTime(hook.start_time)} - {formatTime(hook.end_time)} | {hook.description}
                                 </p>
                               </div>
-                              <div style={{ textAlign: 'right', display: 'flex', alignItems: 'center', gap: '15px' }}>
-                                <div>
-                                  <span style={{ display: 'block', fontWeight: 'bold', fontSize: '1.1rem', color: 'var(--accent)' }}>
-                                    {(hook.hook_score * 100).toFixed(1)}
-                                  </span>
-                                  <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                                    Hook Score
-                                  </span>
-                                </div>
-                                <HookInfoPopover 
-                                  hook={hook} 
-                                  isOpen={activeHookIndex === idx}
-                                  isPinned={pinnedHookIndex === idx} 
-                                  onMouseEnter={() => setHoveredHookIndex(idx)}
-                                  onMouseLeave={() => setHoveredHookIndex(null)}
-                                  onTogglePin={(val) => {
-                                    if (val === false) setPinnedHookIndex(null);
-                                    else setPinnedHookIndex(pinnedHookIndex === idx ? null : idx);
-                                  }} 
-                                />
+                              <div style={{ textAlign: 'right' }}>
+                                <span style={{ display: 'block', fontWeight: 'bold', fontSize: '1.1rem', color: 'var(--accent)' }}>
+                                  {(hook.hook_score * 100).toFixed(1)}
+                                </span>
+                                <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                  Hook Score
+                                </span>
                               </div>
                             </div>
                           ))}
@@ -529,13 +656,10 @@ export default function LiveSongTest() {
                           {result.temporalSegments.map((seg, i) => {
                             const widthPct = ((seg.end_time - seg.start_time) / result.totalDurationSec) * 100;
                             const leftPct = (seg.start_time / result.totalDurationSec) * 100;
-                            // Map hook score to a smooth color gradient
-                            // Low (0.0-0.3) -> Red (~0 hue)
-                            // Medium (0.3-0.7) -> Yellow/Orange (~30-60 hue)
-                            // High (0.7-1.0) -> Green (~120 hue)
-                            const segmentScore = seg.hook_score || seg.golden_candidate_score || seg.hit_probability || 0;
-                            const hue = Math.max(0, Math.min(120, segmentScore * 120));
-                            const color = `hsl(${hue}, 85%, 50%)`;
+                            // Map probability to color: Greenish for high, Reddish for low
+                            const hue = seg.hit_probability > 0.5 ? 140 : 0;
+                            const saturation = Math.abs(seg.hit_probability - 0.5) * 200; // 0 to 100%
+                            const color = `hsl(${hue}, ${saturation}%, 50%)`;
                             
                             return (
                               <div 
@@ -554,6 +678,23 @@ export default function LiveSongTest() {
                               />
                             );
                           })}
+                          
+                          {/* Animated Playback Progress Overlay */}
+                          <div 
+                            style={{
+                              position: 'absolute',
+                              top: 0,
+                              left: 0,
+                              height: '100%',
+                              width: `${(playbackTime / result.totalDurationSec) * 100}%`,
+                              background: 'rgba(255, 255, 255, 0.2)',
+                              borderRight: '2px solid rgba(255, 107, 107, 0.8)',
+                              boxShadow: '2px 0 8px rgba(255, 107, 107, 0.4)',
+                              transition: 'width 0.1s linear',
+                              zIndex: 10,
+                              pointerEvents: 'none'
+                            }}
+                          />
                         </div>
                         <div className="heatmap-labels" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '5px' }}>
                           <span>0:00</span>
@@ -723,6 +864,127 @@ export default function LiveSongTest() {
                 </div>
               )}
             </div>
+
+              {/* Hit Consultant Panel */}
+              {result.prescriptions && result.prescriptions.length > 0 && (
+                <div className="hit-consultant-panel">
+                  <div className="consultant-header">
+                    <h3>🤖 Prescriptive Hit Consultant</h3>
+                    <p>Mathematical production tweaks to maximize viral probability.</p>
+                  </div>
+                  <div className="prescriptions-list">
+                    {result.prescriptions.map((rec, index) => (
+                      <div key={index} className="prescription-card">
+                        <div className="prescription-icon">
+                          {rec.feature === 'tempo' || rec.feature === 'danceability' ? '🥁' : 
+                           rec.feature === 'energy' || rec.feature === 'loudness' ? '⚡' : 
+                           rec.feature === 'valence' ? '😊' : '🎛️'}
+                        </div>
+                        <div className="prescription-details">
+                          <h4>
+                            {rec.direction === 'INCREASE' ? 'Increase ' : 'Decrease '}
+                            {rec.feature.charAt(0).toUpperCase() + rec.feature.slice(1)}
+                          </h4>
+                          <p>
+                            From <strong>{rec.current.toFixed(2)}</strong> to <strong>{rec.suggested.toFixed(2)}</strong>
+                          </p>
+                        </div>
+                        <div className="prescription-gain">
+                          <span className="gain-value">+{rec.improvement_percent.toFixed(1)}%</span>
+                          <span className="gain-label">Hit Prob</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Playground Mode Toggle */}
+              {!showPlayground ? (
+                <div className="playground-toggle" style={{textAlign: 'center', marginTop: '20px'}}>
+                  <button className="btn secondary" onClick={enterPlayground}>
+                    🎛️ Enter Interactive Playground
+                  </button>
+                </div>
+              ) : (
+                <div className="playground-panel">
+                  <div className="playground-header">
+                    <h3>🎛️ Interactive Hit Playground</h3>
+                    <p>Tweak the song's DNA and see the predicted hit probability update live.</p>
+                    <p style={{fontSize: '12px', color: '#ffb84d', marginTop: '5px'}}>
+                      ⚠️ Simulated features include structural parameters. Not all simulated parameters are physically mutable by the Audio Mutator.
+                    </p>
+                  </div>
+                  
+                  <div className="playground-score-container">
+                    <div className="live-score">
+                      <span className="live-score-label">Live Hit Probability</span>
+                      <div className="live-score-value" style={{ color: playgroundScore > result.hit_probability ? '#00ff88' : playgroundScore < result.hit_probability ? '#ff3385' : 'var(--text-primary)' }}>
+                        {playgroundLoading ? <span className="loading-dots">...</span> : `${(playgroundScore * 100).toFixed(1)}%`}
+                      </div>
+                    </div>
+                    {result.prescriptions && result.prescriptions.length > 0 && (
+                      <button className="btn primary snap-btn" onClick={applyConsultantTweaks}>
+                        ✨ Apply Consultant Tweaks
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="playground-sliders">
+                    {playgroundFeatures && Object.keys(playgroundFeatures).filter(k => ['tempo', 'loudness', 'energy', 'liveness', 'acousticness', 'danceability', 'valence', 'speechiness', 'instrumentalness', 'key', 'mode'].includes(k)).map(feature => {
+                      let min = 0; let max = 1; let step = 0.01;
+                      if (feature === 'tempo') { min = 60; max = 250; step = 1; }
+                      if (feature === 'loudness') { min = -60; max = 0; step = 0.1; }
+                      if (feature === 'key') { min = 0; max = 11; step = 1; }
+                      if (feature === 'mode') { min = 0; max = 1; step = 1; }
+                      
+                      return (
+                        <div key={feature} className="slider-group">
+                          <div className="slider-label-row">
+                            <span className="slider-name">{feature.charAt(0).toUpperCase() + feature.slice(1)}</span>
+                            <span className="slider-value">{playgroundFeatures[feature].toFixed(2)}</span>
+                          </div>
+                          <input 
+                            type="range" 
+                            min={min} 
+                            max={max} 
+                            step={step} 
+                            value={playgroundFeatures[feature]} 
+                            onChange={(e) => handlePlaygroundChange(feature, e.target.value)}
+                            className="feature-slider"
+                          />
+                        </div>
+                      )
+                    })}
+                  </div>
+                  
+                  <div className="audio-mutator-section" style={{marginTop: '30px', textAlign: 'center'}}>
+                    {!mutatedAudioUrl ? (
+                      <button 
+                        className="btn primary" 
+                        onClick={generateMutatedAudio} 
+                        disabled={mutatingAudio}
+                        style={{width: '100%', maxWidth: '400px'}}
+                      >
+                        {mutatingAudio ? '⏳ Mutating Audio Physics...' : '🎵 Generate Mutated Audio'}
+                      </button>
+                    ) : (
+                      <div className="mutated-audio-player" style={{background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '12px'}}>
+                        <h4 style={{color: 'var(--primary)', marginBottom: '15px', marginTop: 0}}>🎧 Your Mutated Hit Song</h4>
+                        <audio key={mutatedAudioUrl} controls src={mutatedAudioUrl} style={{width: '100%'}} />
+                        <button 
+                          className="btn secondary" 
+                          onClick={generateMutatedAudio} 
+                          disabled={mutatingAudio}
+                          style={{marginTop: '15px'}}
+                        >
+                          {mutatingAudio ? '⏳ Re-Mutating...' : '🔄 Re-Generate Audio'}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
 
               <div className="result-actions" style={{display: 'flex', gap: '15px', justifyContent: 'center', marginTop: '30px', borderTop: '1px solid #eee', paddingTop: '20px'}}>
                 <button className="btn secondary" onClick={handleDownloadReport}>Download PDF Report</button>

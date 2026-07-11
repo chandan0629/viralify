@@ -4,8 +4,16 @@ export default function App(){
   const [mounted, setMounted] = useState(false)
   const [Layout, setLayout] = useState(null)
   const [Landing, setLanding] = useState(null)
+  const [FavoriteArtistsStep, setFavoriteArtistsStep] = useState(null)
   const [user, setUser] = useState(null)
   const [error, setError] = useState(null)
+  const [onboardingComplete, setOnboardingComplete] = useState(() => {
+    try {
+      return localStorage.getItem('sv_onboarded') === 'true'
+    } catch {
+      return false
+    }
+  })
   const [score, setScore] = useState(() => {
     try {
       return Number(localStorage.getItem('sv_score') || 0)
@@ -39,12 +47,14 @@ export default function App(){
   useEffect(() => {
     const loadComponents = async () => {
       try {
-        const [layoutMod, landingMod] = await Promise.all([
+        const [layoutMod, landingMod, favoriteArtistsMod] = await Promise.all([
           import('./components/Layout'),
-          import('./components/Landing')
+          import('./components/Landing'),
+          import('./components/FavoriteArtistsStep')
         ])
         setLayout(() => layoutMod.default)
         setLanding(() => landingMod.default)
+        setFavoriteArtistsStep(() => favoriteArtistsMod.default)
         setMounted(true)
       } catch (err) {
         console.error('Failed to load components:', err)
@@ -108,7 +118,7 @@ export default function App(){
     </div>
   }
 
-  if (!Layout || !Landing) {
+  if (!Layout || !Landing || !FavoriteArtistsStep) {
     return <div style={{color: '#fff', padding: '40px', textAlign: 'center', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(180deg, #071029 0%, #071a2a 100%)'}}>
       <div>
         <div style={{fontSize: '24px', marginBottom: '20px'}}>🎵 Loading Components...</div>
@@ -119,6 +129,20 @@ export default function App(){
   // Show landing page if user is not logged in
   if (!user) {
     return <Landing onLogin={handleLogin} />
+  }
+
+  // Show onboarding if not complete
+  if (!onboardingComplete) {
+    return <FavoriteArtistsStep 
+      onNext={() => {
+        setOnboardingComplete(true)
+        localStorage.setItem('sv_onboarded', 'true')
+      }}
+      onSkip={() => {
+        setOnboardingComplete(true)
+        localStorage.setItem('sv_onboarded', 'true')
+      }}
+    />
   }
 
   // Show main app if user is logged in
