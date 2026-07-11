@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react'
 
 // Use relative URL for Vercel (same domain), fallback to localhost for development
-const BACKEND_URL = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? '' : 'http://localhost:7860')
+const BACKEND_URL = import.meta.env.VITE_API_URL || 'https://viralify-backend-li673hdf6q-uc.a.run.app'
 
 const DEFAULTS = {
   danceability: 0.65,
