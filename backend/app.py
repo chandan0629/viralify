@@ -359,6 +359,7 @@ def extract_features_from_array(y, sr, true_duration_sec=None):
         all_features['spectral_bandwidth_hz'] = round(float(bandwidth_mean), 2)
         all_features['spectral_rolloff_hz'] = round(float(rolloff_mean), 2)
         all_features['spectral_flatness'] = round(float(flatness_mean), 6)
+        all_features['spectral_flatness_mean'] = round(float(flatness_mean), 6)
         
         # === DANCEABILITY ===
         if len(beat_frames) > 2:
@@ -383,6 +384,7 @@ def extract_features_from_array(y, sr, true_duration_sec=None):
         features['danceability'] = float(np.clip(danceability_raw, 0, 1))
         all_features['beat_regularity'] = round(float(beat_regularity), 4)
         all_features['rhythm_strength'] = round(float(rhythm_strength), 4)
+        all_features['onset_strength_mean'] = round(float(np.mean(onset_env)), 4)
         
         # === VALENCE (Key & Mode via CENS for noise-robust tracking) ===
         chroma = librosa.feature.chroma_cens(y=y_harmonic, sr=sr)
@@ -398,7 +400,7 @@ def extract_features_from_array(y, sr, true_duration_sec=None):
         mode_factor = 0.6 if is_major else 0.4  
         brightness = np.clip(cent_norm * 1.5, 0, 1)
         tempo_valence = np.clip((features['tempo'] - 70) / 100, 0, 1)
-        harmonic_simplicity = 1 - np.clip(np.std(chroma_mean) / np.mean(chroma_mean), 0, 1)
+        harmonic_simplicity = 1 - np.clip(np.std(chroma_mean) / max(np.mean(chroma_mean), 1e-6), 0, 1)
         
         valence_raw = (
             0.25 * mode_factor +           
@@ -477,6 +479,15 @@ def extract_features_from_array(y, sr, true_duration_sec=None):
         for i in range(20):
             all_features[f'mfcc_{i+1}'] = round(float(np.mean(mfccs[i])), 4)
             
+        # === Extended Features for UI ===
+        try:
+            tonnetz = librosa.feature.tonnetz(y=y_harmonic, sr=sr)
+            all_features['tonnetz_mean'] = round(float(np.mean(tonnetz)), 6)
+        except Exception:
+            all_features['tonnetz_mean'] = 0.0
+        all_features['rms_mean'] = round(float(rms_mean), 6)
+        all_features['dynamic_range'] = round(float(dynamic_range), 4)
+
         # Log extracted features
         logger.info(f"Extracted features: {features}")
         features['_all_features'] = all_features
@@ -1017,18 +1028,40 @@ def mutate_audio():
         if not os.path.exists(cache_path):
             return jsonify({'error': 'Analysis cache expired. Please re-upload.'}), 404
             
-        target_tempo = data.get('target_tempo')
-        target_key = data.get('target_key')
-        target_loudness = data.get('target_loudness')
+        def safe_float(val, default=0.0):
+            if val is None:
+                return default
+            try:
+                return float(val)
+            except (ValueError, TypeError):
+                return default
+
+        def safe_int(val, default=0):
+            if val is None:
+                return default
+            try:
+                return int(val)
+            except (ValueError, TypeError):
+                return default
+
+        target_tempo = safe_float(data.get('target_tempo'), 120.0)
+        target_key = safe_int(data.get('target_key'), 0)
+        target_loudness = safe_float(data.get('target_loudness'), -6.0)
+        target_energy = safe_float(data.get('target_energy'), 0.5)
+        target_liveness = safe_float(data.get('target_liveness'), 0.5)
+        target_acousticness = safe_float(data.get('target_acousticness'), 0.5)
         
         # Load audio from cache
         with np.load(cache_path) as npz:
-            y = npz['y'].astype(np.float32)
+            y = np.nan_to_num(npz['y'].astype(np.float32))
             sr = float(npz['sr'])
             
-        original_tempo = data.get('original_tempo', 120)
-        original_key = data.get('original_key', 0)
-        original_loudness = data.get('original_loudness', -6)
+        original_tempo = safe_float(data.get('original_tempo'), 120.0)
+        original_key = safe_int(data.get('original_key'), 0)
+        original_loudness = safe_float(data.get('original_loudness'), -6.0)
+        original_energy = safe_float(data.get('original_energy'), 0.5)
+        original_liveness = safe_float(data.get('original_liveness'), 0.5)
+        original_acousticness = safe_float(data.get('original_acousticness'), 0.5)
         
         # 1 & 2. TIME STRETCH AND PITCH SHIFT
         rate = 1.0
@@ -1061,9 +1094,7 @@ def mutate_audio():
                 plugins.append(Gain(gain_db=gain_db))
                 
         # Energy -> Distortion + Compression or Lowpass
-        target_energy = data.get('target_energy')
-        original_energy = data.get('original_energy', 0.5)
-        if target_energy is not None:
+        if 'target_energy' in data and data['target_energy'] is not None:
             energy_delta = target_energy - original_energy
             if energy_delta > 0.03:
                 # More energy -> crunchier, highly compressed
@@ -1074,17 +1105,13 @@ def mutate_audio():
                 plugins.append(LowpassFilter(cutoff_frequency_hz=max(200, 8000 - (abs(energy_delta) * 15000))))
                 
         # Liveness -> Reverb (needs to be aggressive to trick librosa)
-        target_liveness = data.get('target_liveness')
-        original_liveness = data.get('original_liveness', 0.5)
-        if target_liveness is not None:
+        if 'target_liveness' in data and data['target_liveness'] is not None:
             liveness_delta = target_liveness - original_liveness
             if liveness_delta > 0.03:
                 plugins.append(Reverb(room_size=min(1.0, liveness_delta * 3.0), wet_level=min(0.9, liveness_delta * 2.5)))
                 
         # Acousticness -> Highpass + Chorus + EQ
-        target_acousticness = data.get('target_acousticness')
-        original_acousticness = data.get('original_acousticness', 0.5)
-        if target_acousticness is not None:
+        if 'target_acousticness' in data and data['target_acousticness'] is not None:
             ac_delta = target_acousticness - original_acousticness
             if ac_delta > 0.03:
                 # More acoustic -> remove harsh subbass, add natural warmth and air

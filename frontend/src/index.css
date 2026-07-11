@@ -1,0 +1,9 @@
+
+/* Global Touch Accessibility for Mobile */
+@media (max-width: 768px) {
+  button, 
+  .btn,
+  input[type="range"] {
+    min-height: 44px; /* Apple Human Interface Guidelines minimum touch target */
+  }
+}

@@ -64,6 +64,7 @@ const AnimatedCounter = ({ end, duration = 2000, prefix = "", suffix = "" }) => 
 
 export default function Landing({ onLogin }) {
   const [isScrolled, setIsScrolled] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [showAuth, setShowAuth] = useState(false)
   const [authMode, setAuthMode] = useState(true) // true for login, false for signup
   const [activeFaq, setActiveFaq] = useState(null)
@@ -149,16 +150,42 @@ export default function Landing({ onLogin }) {
             Viralify
           </div>
           <nav className="nav-links">
-            <button className={isScrolled ? '' : 'active'} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Home</button>
-            <button onClick={() => scrollToSection('about')}>Why Viralify</button>
-            <button onClick={() => scrollToSection('about-viralify')}>About</button>
-            <button onClick={() => scrollToSection('how-it-works')}>Working</button>
-            <button onClick={() => scrollToSection('features')}>Features</button>
-            <button onClick={() => scrollToSection('faq')}>FAQs</button>
+            <button className={isScrolled ? '' : 'active'} onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); setMobileMenuOpen(false); }}>Home</button>
+            <button onClick={() => { scrollToSection('about'); setMobileMenuOpen(false); }}>Why Viralify</button>
+            <button onClick={() => { scrollToSection('about-viralify'); setMobileMenuOpen(false); }}>About</button>
+            <button onClick={() => { scrollToSection('how-it-works'); setMobileMenuOpen(false); }}>Working</button>
+            <button onClick={() => { scrollToSection('features'); setMobileMenuOpen(false); }}>Features</button>
+            <button onClick={() => { scrollToSection('faq'); setMobileMenuOpen(false); }}>FAQs</button>
           </nav>
           <div className="nav-auth">
             <button className="nav-btn-login" onClick={handleLoginClick}>Login</button>
             <button className="nav-btn-signup" onClick={handleSignupClick}>Sign Up</button>
+          </div>
+          {/* Mobile Hamburger Toggle */}
+          <button 
+            className={`mobile-menu-toggle ${mobileMenuOpen ? 'active' : ''}`}
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle mobile menu"
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </div>
+        
+        {/* Mobile Navigation Drawer */}
+        <div className={`mobile-nav-drawer ${mobileMenuOpen ? 'open' : ''}`}>
+          <div className="mobile-nav-links">
+            <button onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); setMobileMenuOpen(false); }}>Home</button>
+            <button onClick={() => { scrollToSection('about'); setMobileMenuOpen(false); }}>Why Viralify</button>
+            <button onClick={() => { scrollToSection('about-viralify'); setMobileMenuOpen(false); }}>About</button>
+            <button onClick={() => { scrollToSection('how-it-works'); setMobileMenuOpen(false); }}>Working</button>
+            <button onClick={() => { scrollToSection('features'); setMobileMenuOpen(false); }}>Features</button>
+            <button onClick={() => { scrollToSection('faq'); setMobileMenuOpen(false); }}>FAQs</button>
+          </div>
+          <div className="mobile-nav-auth">
+            <button className="nav-btn-login" onClick={() => { handleLoginClick(); setMobileMenuOpen(false); }}>Login</button>
+            <button className="nav-btn-signup" onClick={() => { handleSignupClick(); setMobileMenuOpen(false); }}>Sign Up</button>
           </div>
         </div>
       </header>

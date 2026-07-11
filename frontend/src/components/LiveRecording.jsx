@@ -182,7 +182,8 @@ export default function LiveRecording() {
           prediction: data.prediction,
           features: data.features || data.extracted_features,
           analysisId: data.analysisId,
-          prescriptions: data.suggestions || data.prescriptions || []
+          prescriptions: data.suggestions || data.prescriptions || [],
+          warning: data.warning
         });
       }, 2000);
     } catch (err) {
@@ -426,6 +427,26 @@ export default function LiveRecording() {
                 <h3>{result.isViral ? '🚀 Viral Hit!' : '📊 Below Average'}</h3>
                 <p className="song-title">{result.fileName}</p>
               </div>
+
+              {result.warning && (
+                <div className="speech-warning-banner" style={{
+                  padding: '14px 18px',
+                  background: 'rgba(255, 184, 77, 0.08)',
+                  border: '1px solid rgba(255, 184, 77, 0.3)',
+                  borderRadius: '10px',
+                  color: '#ffb84d',
+                  marginBottom: '24px',
+                  fontSize: '0.92rem',
+                  lineHeight: '1.5',
+                  textAlign: 'left',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '10px'
+                }}>
+                  <span style={{ fontSize: '1.2rem', marginTop: '-2px' }}>⚠️</span>
+                  <div>{result.warning}</div>
+                </div>
+              )}
 
               <div className="viral-score-section">
                 <div className="viral-meter">

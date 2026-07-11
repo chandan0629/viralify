@@ -1210,3 +1210,56 @@ input[type="file"] {
     font-size: 2.2rem;
   }
 }
+
+/* Additional Responsive Tweaks for Analysis Cards */
+@media (max-width: 768px) {
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px;
+  }
+  
+  .ext-features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .playground-sliders {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .prescription-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+  
+  .prescription-icon {
+    margin: 0 auto;
+  }
+  
+  .prescription-gain {
+    align-self: center;
+    margin-top: 10px;
+  }
+  
+  .result-card {
+    padding: 20px;
+  }
+  
+  .viral-score-section {
+    padding: 16px;
+  }
+  
+  .score-value {
+    font-size: 3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .features-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .result-header h3 {
+    font-size: 1.5rem;
+  }
+}
