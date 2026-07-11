@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Predict the viral potential of your songs with Viralify. Our AI machine learning models analyze musical features to give you actionable insights and hit predictions." />
+    <meta name="keywords" content="Viralify, music analysis, hit prediction, viral song predictor, audio analysis AI, machine learning music" />
+    <meta property="og:title" content="Viralify | AI-Powered Song Hit Prediction" />
+    <meta property="og:description" content="Predict the viral potential of your songs with Viralify. Get actionable insights based on advanced ML analysis of audio features." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Viralify | AI-Powered Song Hit Prediction" />
+    <meta name="twitter:description" content="Predict the viral potential of your songs with Viralify. Get actionable insights based on advanced ML analysis." />
+    <title>Viralify | AI-Powered Song Hit Prediction</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { 
+        background: #0f1724; 
+        color: #e6eef6; 
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #root {
+        width: 100%;
+        min-height: 100vh;
+      }
+      .loading {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        gap: 20px;
+        font-size: 24px;
+      }
+      .spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid rgba(255, 122, 182, 0.2);
+        border-top-color: #ff7ab6;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+      .error {
+        background: #ff6b6b;
+        color: white;
+        padding: 20px;
+        border-radius: 8px;
+        max-width: 600px;
+        font-family: monospace;
+        font-size: 14px;
+        white-space: pre-wrap;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <div class="loading">
+        <div class="spinner"></div>
+        <div>Loading App...</div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.jsx"></script>
+    <script>
+      // Show error if not loaded in 5 seconds
+      setTimeout(() => {
+        const root = document.getElementById('root');
+        if (root.innerHTML.includes('spinner')) {
+          root.innerHTML = '<div class="error">ERROR: App failed to load.\n\nCheck browser console for details.</div>';
+        }
+      }, 5000);
+    </script>
+  </body>
+</html>

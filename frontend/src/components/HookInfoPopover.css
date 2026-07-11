@@ -1,0 +1,210 @@
+.hook-info-wrapper {
+  position: relative;
+  display: inline-block;
+  z-index: 100;
+}
+
+.info-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--text-secondary, #aaa);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.info-btn:hover, .info-btn.pinned {
+  background: var(--accent, #1DB954);
+  color: #fff;
+  border-color: var(--accent, #1DB954);
+  box-shadow: 0 0 10px rgba(29, 185, 84, 0.4);
+}
+
+.info-panel {
+  position: absolute;
+  top: -10px;
+  width: 320px;
+  background: rgba(20, 20, 25, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 0;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+  z-index: 10000;
+  text-align: left;
+  cursor: default;
+  animation: fadeInPanel 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes fadeInPanel {
+  0% { opacity: 0; transform: scale(0.95) translateX(-10px); }
+  100% { opacity: 1; transform: scale(1) translateX(0); }
+}
+
+.info-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px 12px 0 0;
+}
+
+.info-panel-header h4 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--text-primary, #fff);
+  font-weight: 600;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary, #aaa);
+  font-size: 20px;
+  cursor: pointer;
+  line-height: 1;
+  transition: color 0.2s;
+  padding: 0 5px;
+}
+
+.close-btn:hover {
+  color: #fff;
+}
+
+.info-panel-content {
+  padding: 20px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* Custom scrollbar for panel */
+.info-panel-content::-webkit-scrollbar {
+  width: 6px;
+}
+.info-panel-content::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+.info-panel-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.info-section {
+  margin-bottom: 18px;
+}
+
+.info-section:last-child {
+  margin-bottom: 0;
+}
+
+.info-section h5 {
+  margin: 0 0 8px 0;
+  font-size: 0.85rem;
+  color: var(--accent, #1DB954);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-section ul {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--text-secondary, #ddd);
+  font-size: 0.9rem;
+}
+
+.info-section li {
+  margin-bottom: 4px;
+}
+
+.feature-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.feature-tag {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  color: #fff;
+}
+
+.calc-box {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 10px;
+  border-radius: 6px;
+  border-left: 3px solid var(--accent, #1DB954);
+}
+
+.calc-box p {
+  margin: 0 0 5px 0;
+  font-size: 0.85rem;
+  color: #eee;
+  font-family: monospace;
+}
+
+.calc-box p:last-child {
+  margin: 0;
+}
+
+.insight-section {
+  background: rgba(29, 185, 84, 0.1);
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(29, 185, 84, 0.2);
+}
+
+.insight-text {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #fff;
+  font-style: italic;
+}
+
+.edu-section {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+}
+
+.edu-section h5 {
+  color: #fff;
+}
+
+.edu-section p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary, #ccc);
+  line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+  .info-panel {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translate(-50%, -50%) !important;
+    width: 90% !important;
+  .info-panel {
+    left: 50% !important;
+    top: 50% !important;
+    animation: fadeInPopMobile 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  }
+  @keyframes fadeInPopMobile {
+    0% { opacity: 0; transform: translate(-50%, -45%) !important; }
+    100% { opacity: 1; transform: translate(-50%, -50%) !important; }
+  }
+}

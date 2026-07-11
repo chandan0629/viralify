@@ -1,0 +1,26 @@
+{
+  "model_type": "LSTM",
+  "model_framework": "lstm",
+  "accuracy": 0.5989198684692383,
+  "training_time": 774.049777,
+  "data_hash": "a9910e384a9e5c575c45f27ab0f12721",
+  "feature_names": [
+    "danceability",
+    "energy",
+    "key",
+    "loudness",
+    "mode",
+    "speechiness",
+    "acousticness",
+    "instrumentalness",
+    "liveness",
+    "valence",
+    "tempo",
+    "duration_ms"
+  ],
+  "created_at": "2026-07-08T14:06:15.917005",
+  "data_size": 176832,
+  "bias_correction": "calibrated",
+  "bias_correction_method": "isotonic-inspired calibration based on empirical hit ratio",
+  "scale_pos_weight": "enabled"
+}
