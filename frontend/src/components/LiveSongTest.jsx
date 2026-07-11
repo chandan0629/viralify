@@ -138,7 +138,7 @@ export default function LiveSongTest({ onResult }) {
         topHooks: [], // To be fetched in Phase 2
         totalDurationSec: prediction.total_duration_sec || 180,
         analysisId: prediction.analysisId,
-        prescriptions: prediction.prescriptions || []
+        prescriptions: prediction.suggestions || prediction.prescriptions || []
       })
 
       if (onResult) {
