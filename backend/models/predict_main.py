@@ -788,10 +788,10 @@ class SongHitPredictor:
                     improvement = test_prob - original_prob
                     
                     if improvement > best_improvement:
-                            best_improvement = improvement
-                            best_suggested_val = test_val
-                            best_new_prob = test_prob
-                            best_direction = "INCREASE" if direction_sign == 1 else "DECREASE"
+                        best_improvement = improvement
+                        best_suggested_val = test_val
+                        best_new_prob = test_prob
+                        best_direction = "INCREASE" if test_val > current_value else "DECREASE"
                             
             # Show any positive improvement, no matter how small, so the user has options
             if best_improvement > 0.0:
