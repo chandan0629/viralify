@@ -738,13 +738,12 @@ def analyze_audio():
         
         # Get prescriptive suggestions for improvement
         prescriptions = []
+        warning = None
         if is_speech:
             result['hit_probability'] = float(np.random.uniform(0.01, 0.05))
             result['is_hit_prediction'] = False
             result['confidence'] = 0.95
-            prescriptions = [
-                "⚠️ Spoken Word Detected: The uploaded audio sounds like normal conversation or spoken word rather than music. This prediction model is optimized for music tracks; speech/talks have very low probability of ranking as hit songs."
-            ]
+            warning = "Spoken Word Detected: The uploaded audio sounds like normal conversation or spoken word rather than music. This prediction model is optimized for music tracks."
         elif result['hit_probability'] < 0.95: # Suggest improvements if not already perfect
             prescriptions = predictor.suggest_feature_improvements(features)
         
@@ -1082,7 +1081,7 @@ def mutate_audio():
 
         # Write to temporary file
         out_path = os.path.join(tempfile.gettempdir(), f'mutated_{analysis_id}.wav')
-        sf.write(out_path, y, sr)
+        sf.write(out_path, y, int(sr))
         
         # Send file back
         return send_file(out_path, mimetype='audio/wav', as_attachment=True, download_name='mutated_hit.wav')
