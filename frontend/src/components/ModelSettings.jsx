@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Settings, Cpu, CheckCircle, Database, AlertCircle, Zap, ShieldCheck } from 'lucide-react'
 import './ModelSettings.css'
 
-const BACKEND_URL = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? '' : 'http://localhost:5005')
+const BACKEND_URL = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? '' : 'http://localhost:7860')
 
 export default function ModelSettings() {
   const [modelInfo, setModelInfo] = useState(null)

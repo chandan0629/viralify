@@ -28,7 +28,7 @@ export default function LiveRecording() {
   const timerRef = useRef(null);
   const reportRef = useRef(null);
 
-  const BACKEND_URL = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? '' : 'http://localhost:5000');
+  const BACKEND_URL = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? '' : 'http://localhost:7860');
 
   useEffect(() => {
     return () => {
