@@ -13,6 +13,15 @@ export default function LiveRecording() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [progress, setProgress] = useState(0);
+  
+  // Playground state
+  const [showPlayground, setShowPlayground] = useState(false);
+  const [playgroundFeatures, setPlaygroundFeatures] = useState(null);
+  const [playgroundScore, setPlaygroundScore] = useState(null);
+  const [playgroundLoading, setPlaygroundLoading] = useState(false);
+  const [mutatingAudio, setMutatingAudio] = useState(false);
+  const [mutatedAudioUrl, setMutatedAudioUrl] = useState(null);
+  const debounceTimerRef = useRef(null);
 
   const mediaRecorderRef = useRef(null);
   const chunksRef = useRef([]);
@@ -164,13 +173,16 @@ export default function LiveRecording() {
       setAnalyzing(true);
       setTimeout(() => {
         setAnalyzing(false);
-        setResult({
+          setResult({
           fileName: 'Live Recording',
+          hit_probability: data.hit_probability,
           viralScore: (data.hit_probability * 100).toFixed(1),
           isViral: data.isViral,
           confidence: (data.confidence * 100).toFixed(0),
           prediction: data.prediction,
-          features: data.features || data.extracted_features
+          features: data.features || data.extracted_features,
+          analysisId: data.analysisId,
+          prescriptions: data.suggestions || data.prescriptions || []
         });
       }, 2000);
     } catch (err) {
@@ -222,6 +234,115 @@ export default function LiveRecording() {
     setResult(null);
     setError(null);
     setProgress(0);
+    setShowPlayground(false);
+    setMutatedAudioUrl(null);
+  };
+
+  const enterPlayground = () => {
+    setPlaygroundFeatures({ ...result.features });
+    setPlaygroundScore(result.hit_probability);
+    setShowPlayground(true);
+  };
+
+  const scaleScore = (rawScore, originalScore) => {
+    if (rawScore == null || isNaN(rawScore)) return originalScore || 0;
+    if (originalScore == null || isNaN(originalScore)) return rawScore;
+    if (rawScore <= originalScore) return rawScore;
+    const maxGain = 1.0 - originalScore;
+    if (maxGain <= 0) return originalScore;
+    const uiMaxGain = maxGain * 0.45;
+    const actualGain = rawScore - originalScore;
+    const scaledGain = uiMaxGain * (1 - Math.exp(-2.5 * actualGain / uiMaxGain));
+    return originalScore + scaledGain;
+  };
+
+  const handlePlaygroundChange = (feature, value) => {
+    const newFeatures = { ...playgroundFeatures, [feature]: parseFloat(value) };
+    setPlaygroundFeatures(newFeatures);
+    
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    setPlaygroundLoading(true);
+    
+    debounceTimerRef.current = setTimeout(async () => {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/predict`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newFeatures)
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setPlaygroundScore(scaleScore(data.hit_probability, result.hit_probability));
+        }
+      } catch (err) {
+        console.error("Playground predict error:", err);
+      } finally {
+        setPlaygroundLoading(false);
+      }
+    }, 400);
+  };
+
+  const applyConsultantTweaks = () => {
+    if (!result || !result.prescriptions) return;
+    let newFeatures = { ...playgroundFeatures };
+    result.prescriptions.forEach(rec => {
+      newFeatures[rec.feature] = rec.suggested;
+    });
+    setPlaygroundFeatures(newFeatures);
+    
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    setPlaygroundLoading(true);
+    fetch(`${BACKEND_URL}/api/predict`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newFeatures)
+    }).then(res => res.json()).then(data => {
+      setPlaygroundScore(scaleScore(data.hit_probability, result.hit_probability));
+      setPlaygroundLoading(false);
+    }).catch(() => setPlaygroundLoading(false));
+  };
+
+  const generateMutatedAudio = async () => {
+    if (!result || !result.analysisId) return;
+    
+    setMutatingAudio(true);
+    setError(null);
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/mutate-audio`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          analysisId: result.analysisId,
+          target_tempo: playgroundFeatures.tempo,
+          target_key: playgroundFeatures.key,
+          target_loudness: playgroundFeatures.loudness,
+          target_energy: playgroundFeatures.energy,
+          target_liveness: playgroundFeatures.liveness,
+          target_acousticness: playgroundFeatures.acousticness,
+          original_tempo: result.features.tempo,
+          original_key: result.features.key,
+          original_loudness: result.features.loudness,
+          original_energy: result.features.energy,
+          original_liveness: result.features.liveness,
+          original_acousticness: result.features.acousticness
+        })
+      });
+      
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error || 'Failed to mutate audio');
+      }
+      
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      setMutatedAudioUrl(url);
+      
+    } catch (err) {
+      setError(err.message || 'Error mutating audio');
+      console.error(err);
+    } finally {
+      setMutatingAudio(false);
+    }
   };
 
   return (
@@ -477,9 +598,130 @@ export default function LiveRecording() {
                 </div>
               )}
 
-              <div className="result-actions">
+              {/* Hit Consultant Panel */}
+              {result.prescriptions && result.prescriptions.length > 0 && (
+                <div className="hit-consultant-panel">
+                  <div className="consultant-header">
+                    <h3>🤖 Prescriptive Hit Consultant</h3>
+                    <p>Mathematical production tweaks to maximize viral probability.</p>
+                  </div>
+                  <div className="prescriptions-list">
+                    {result.prescriptions.map((rec, index) => (
+                      <div key={index} className="prescription-card">
+                        <div className="prescription-icon">
+                          {rec.feature === 'tempo' || rec.feature === 'danceability' ? '🥁' : 
+                           rec.feature === 'energy' || rec.feature === 'loudness' ? '⚡' : 
+                           rec.feature === 'valence' ? '😊' : '🎛️'}
+                        </div>
+                        <div className="prescription-details">
+                          <h4>
+                            {rec.direction === 'INCREASE' ? 'Increase ' : 'Decrease '}
+                            {rec.feature.charAt(0).toUpperCase() + rec.feature.slice(1)}
+                          </h4>
+                          <p>
+                            From <strong>{rec.current.toFixed(2)}</strong> to <strong>{rec.suggested.toFixed(2)}</strong>
+                          </p>
+                        </div>
+                        <div className="prescription-gain">
+                          <span className="gain-value">+{rec.improvement_percent.toFixed(1)}%</span>
+                          <span className="gain-label">Hit Prob</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Playground Mode Toggle */}
+              {!showPlayground ? (
+                <div className="playground-toggle" style={{textAlign: 'center', marginTop: '20px'}}>
+                  <button className="btn secondary" onClick={enterPlayground}>
+                    🎛️ Enter Interactive Playground
+                  </button>
+                </div>
+              ) : (
+                <div className="playground-panel">
+                  <div className="playground-header">
+                    <h3>🎛️ Interactive Hit Playground</h3>
+                    <p>Tweak the song's DNA and see the predicted hit probability update live.</p>
+                    <p style={{fontSize: '12px', color: '#ffb84d', marginTop: '5px'}}>
+                      ⚠️ Simulated features include structural parameters. Not all simulated parameters are physically mutable by the Audio Mutator.
+                    </p>
+                  </div>
+                  
+                  <div className="playground-score-container">
+                    <div className="live-score">
+                      <span className="live-score-label">Live Hit Probability</span>
+                      <div className="live-score-value" style={{ color: playgroundScore > result.hit_probability ? '#00ff88' : playgroundScore < result.hit_probability ? '#ff3385' : 'var(--text-primary)' }}>
+                        {playgroundLoading ? <span className="loading-dots">...</span> : `${(playgroundScore * 100).toFixed(1)}%`}
+                      </div>
+                    </div>
+                    {result.prescriptions && result.prescriptions.length > 0 && (
+                      <button className="btn primary snap-btn" onClick={applyConsultantTweaks}>
+                        ✨ Apply Consultant Tweaks
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="playground-sliders">
+                    {playgroundFeatures && Object.keys(playgroundFeatures).filter(k => ['tempo', 'loudness', 'energy', 'liveness', 'acousticness', 'danceability', 'valence', 'speechiness', 'instrumentalness', 'key', 'mode'].includes(k)).map(feature => {
+                      let min = 0; let max = 1; let step = 0.01;
+                      if (feature === 'tempo') { min = 60; max = 250; step = 1; }
+                      if (feature === 'loudness') { min = -60; max = 0; step = 0.1; }
+                      if (feature === 'key') { min = 0; max = 11; step = 1; }
+                      if (feature === 'mode') { min = 0; max = 1; step = 1; }
+                      
+                      return (
+                        <div key={feature} className="slider-group">
+                          <div className="slider-label-row">
+                            <span className="slider-name">{feature.charAt(0).toUpperCase() + feature.slice(1)}</span>
+                            <span className="slider-value">{playgroundFeatures[feature].toFixed(2)}</span>
+                          </div>
+                          <input 
+                            type="range" 
+                            min={min} 
+                            max={max} 
+                            step={step} 
+                            value={playgroundFeatures[feature]} 
+                            onChange={(e) => handlePlaygroundChange(feature, e.target.value)}
+                            className="feature-slider"
+                          />
+                        </div>
+                      )
+                    })}
+                  </div>
+                  
+                  <div className="audio-mutator-section" style={{marginTop: '30px', textAlign: 'center'}}>
+                    {!mutatedAudioUrl ? (
+                      <button 
+                        className="btn primary" 
+                        onClick={generateMutatedAudio} 
+                        disabled={mutatingAudio}
+                        style={{width: '100%', maxWidth: '400px'}}
+                      >
+                        {mutatingAudio ? '⏳ Mutating Audio Physics...' : '🎵 Generate Mutated Audio'}
+                      </button>
+                    ) : (
+                      <div className="mutated-audio-player" style={{background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '12px'}}>
+                        <h4 style={{color: 'var(--primary)', marginBottom: '15px', marginTop: 0}}>🎧 Your Mutated Hit Song</h4>
+                        <audio key={mutatedAudioUrl} controls src={mutatedAudioUrl} style={{width: '100%'}} />
+                        <button 
+                          className="btn secondary" 
+                          onClick={generateMutatedAudio} 
+                          disabled={mutatingAudio}
+                          style={{marginTop: '15px'}}
+                        >
+                          {mutatingAudio ? '⏳ Re-Mutating...' : '🔄 Re-Generate Audio'}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              <div className="result-actions" style={{display: 'flex', gap: '15px', justifyContent: 'center', marginTop: '30px', borderTop: '1px solid #eee', paddingTop: '20px'}}>
                 <button className="btn secondary" onClick={handleDownloadReport}>Download PDF Report</button>
-                <button className="btn secondary" onClick={handleDownloadAudio}>Download Audio</button>
+                <button className="btn secondary" onClick={handleDownloadAudio}>Download Original Audio</button>
                 <button className="btn primary" onClick={resetRecording}>Try Another</button>
               </div>
             </div>
