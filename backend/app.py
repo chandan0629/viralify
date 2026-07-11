@@ -315,6 +315,11 @@ def extract_features_from_array(y, sr, true_duration_sec=None):
         rms_max = np.max(rms_weighted) + 1e-10
         rms_min = np.min(rms_weighted) + 1e-10
         
+        # Calculate silence ratio (percentage of frames with energy < 15% of max)
+        normalized_rms = rms_weighted / rms_max
+        silence_ratio = float(np.mean(normalized_rms < 0.15))
+        features['silence_ratio'] = silence_ratio
+        
         # === ENERGY ===
         energy_raw = rms_mean / rms_max
         dynamic_range = rms_max / rms_min
@@ -723,19 +728,31 @@ def analyze_audio():
         all_features = features.get('_all_features', {})
         zcr_mean = all_features.get('zero_crossing_rate', 0.0)
         zcr_factor = np.clip((zcr_mean - 0.03) / 0.12, 0.0, 1.0)
-        flatness_mean = all_features.get('spectral_flatness', 0.0)
-        speech_flatness = np.clip(1.0 - abs(flatness_mean - 0.1) * 5.0, 0.0, 1.0)
+        # Robust Acoustic Heuristic for Speech Classification
+        silence_ratio = features.get('silence_ratio', 0.0)
         harmonic_ratio = all_features.get('harmonic_ratio', 0.0)
-        speech_harmonic = 1.0 - harmonic_ratio
         
-        speechiness_raw = (
-            0.50 * zcr_factor +
-            0.30 * speech_flatness +
-            0.20 * speech_harmonic
-        )
+        speech_score = 0.0
         
-        is_speech = (speechiness_raw > 0.55) and (features.get('energy', 0.5) < 0.30)
-        
+        # 1. Speech has natural pauses between words (high silence ratio)
+        if silence_ratio > 0.15:
+            speech_score += 1.5
+        elif silence_ratio > 0.10:
+            speech_score += 0.5
+            
+        # 2. Speech has very low harmonic content compared to music
+        if harmonic_ratio < 0.5:
+            speech_score += 1.0
+        elif harmonic_ratio < 0.7:
+            speech_score += 0.5
+            
+        # 3. Consonants produce high zero-crossing rates
+        if zcr_factor > 0.5:
+            speech_score += 1.0
+            
+        # Threshold for speech is 2.0 out of 3.5 total possible points
+        # This completely removes the flawed absolute energy threshold
+        is_speech = speech_score >= 2.0        
         # Get prescriptive suggestions for improvement
         prescriptions = []
         warning = None
