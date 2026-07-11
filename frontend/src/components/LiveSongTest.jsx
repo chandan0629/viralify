@@ -197,11 +197,14 @@ export default function LiveSongTest({ onResult }) {
       
       const hookData = await response.json();
       
-      setResult(prev => ({
-        ...prev,
-        temporalSegments: hookData.temporal_segments || [],
-        topHooks: hookData.top_hooks || []
-      }));
+      setResult(prev => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          temporalSegments: hookData.temporal_segments || [],
+          topHooks: hookData.top_hooks || []
+        };
+      });
       
     } catch (err) {
       clearInterval(interval);
@@ -893,11 +896,11 @@ export default function LiveSongTest({ onResult }) {
                             {rec.feature.charAt(0).toUpperCase() + rec.feature.slice(1)}
                           </h4>
                           <p>
-                            From <strong>{rec.current.toFixed(2)}</strong> to <strong>{rec.suggested.toFixed(2)}</strong>
+                            From <strong>{rec.current?.toFixed(2)}</strong> to <strong>{rec.suggested?.toFixed(2)}</strong>
                           </p>
                         </div>
                         <div className="prescription-gain">
-                          <span className="gain-value">+{rec.improvement_percent.toFixed(1)}%</span>
+                          <span className="gain-value">+{rec.improvement_percent?.toFixed(1)}%</span>
                           <span className="gain-label">Hit Prob</span>
                         </div>
                       </div>
@@ -949,7 +952,7 @@ export default function LiveSongTest({ onResult }) {
                         <div key={feature} className="slider-group">
                           <div className="slider-label-row">
                             <span className="slider-name">{feature.charAt(0).toUpperCase() + feature.slice(1)}</span>
-                            <span className="slider-value">{playgroundFeatures[feature].toFixed(2)}</span>
+                            <span className="slider-value">{playgroundFeatures[feature]?.toFixed(2) || 0}</span>
                           </div>
                           <input 
                             type="range" 
