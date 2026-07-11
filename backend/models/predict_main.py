@@ -728,8 +728,11 @@ class SongHitPredictor:
             
         suggestions = []
 
-        # Only suggest features that our DSP mutator can physically change
-        mutable_features = ['tempo', 'loudness', 'key', 'energy', 'liveness', 'acousticness']
+        # Suggest features that can be tweaked in the Interactive Hit Playground
+        mutable_features = [
+            'tempo', 'loudness', 'key', 'energy', 'liveness', 
+            'acousticness', 'danceability', 'valence', 'speechiness', 'instrumentalness'
+        ]
         
         for feature in self.musical_dna_features:
             if feature not in original_features.columns or feature not in optimal_ranges:
@@ -745,17 +748,21 @@ class SongHitPredictor:
             # Test improvement by moving towards optimal value
             test_features = original_features.copy()
 
-            # Realistic physical mutation limits for DSP filters
+            # Realistic limits for how much we can reasonably suggest changing a song
             max_deltas = {
-                'tempo': current_value * 0.15 if current_value > 0 else 15.0, # Max 15% tempo shift
-                'loudness': 4.0, # Max 4dB shift
-                'key': 2.0, # Max 2 semitones
-                'energy': 0.15,
-                'liveness': 0.15,
-                'acousticness': 0.20
+                'tempo': current_value * 0.25 if current_value > 0 else 25.0, # Max 25% tempo shift
+                'loudness': 8.0, # Max 8dB shift
+                'key': 4.0, # Max 4 semitones
+                'energy': 0.30,
+                'liveness': 0.30,
+                'acousticness': 0.40,
+                'danceability': 0.30,
+                'valence': 0.30,
+                'speechiness': 0.20,
+                'instrumentalness': 0.30
             }
             
-            max_delta = max_deltas.get(feature, 0.15)
+            max_delta = max_deltas.get(feature, 0.20)
             
             # We want to find the best possible improvement within the max_delta range
             # We will test both INCREASE and DECREASE directions with small steps
@@ -764,7 +771,7 @@ class SongHitPredictor:
             best_direction = "OPTIMAL"
             best_new_prob = original_prob
             
-            steps = 5
+            steps = 8
             step_size = max_delta / steps
             
             for direction_sign in [1, -1]:
@@ -795,7 +802,7 @@ class SongHitPredictor:
                             best_direction = "INCREASE" if direction_sign == 1 else "DECREASE"
                             
             # Only suggest if it actually provides a meaningful positive improvement
-            if best_improvement > 0.005:
+            if best_improvement > 0.001:
                 suggestions.append({
                     'feature': feature,
                     'current': float(current_value),
