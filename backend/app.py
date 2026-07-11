@@ -250,9 +250,8 @@ def extract_audio_features(audio_file):
         return None
     
     try:
-        # Load audio file with optimal settings for feature extraction
-        # OPTIMIZED: Only load the "Golden 60 seconds" (0:15 - 1:15) to prevent 512MB RAM crashes on Render
-        y, sr = librosa.load(audio_file, sr=22050, mono=True, offset=15.0, duration=60.0)
+        # Load full audio file
+        y, sr = librosa.load(audio_file, sr=22050, mono=True)
         
         if len(y) == 0:
             raise ValueError("Empty audio file")
@@ -683,8 +682,8 @@ def analyze_audio():
         import soundfile as sf
         true_duration_sec = sf.info(temp_path).duration
         
-        # Load audio (OPTIMIZED: Only load 60 seconds to prevent 512MB RAM OOM crashes)
-        y_full, sr = librosa.load(temp_path, sr=22050, mono=True, offset=15.0, duration=60.0)
+        # Load audio (Full length)
+        y_full, sr = librosa.load(temp_path, sr=22050, mono=True)
         if len(y_full) == 0:
             raise ValueError("Empty audio file")
             
@@ -987,8 +986,8 @@ def mutate_audio():
         
         # Load audio from cache
         with np.load(cache_path) as npz:
-            y = npz['y']
-            sr = int(npz['sr'])
+            y = npz['y'].astype(np.float32)
+            sr = float(npz['sr'])
             
         original_tempo = data.get('original_tempo', 120)
         original_key = data.get('original_key', 0)
@@ -1008,7 +1007,7 @@ def mutate_audio():
 
         if abs(rate - 1.0) > 0.02 or n_steps != 0:
             if PEDALBOARD_AVAILABLE:
-                y = time_stretch(y, sr, stretch_factor=rate, pitch_shift_in_semitones=float(n_steps))
+                y = time_stretch(y, sr, stretch_factor=float(rate), pitch_shift_in_semitones=float(n_steps))
             else:
                 if abs(rate - 1.0) > 0.02:
                     y = librosa.effects.time_stretch(y, rate=rate)
