@@ -721,11 +721,8 @@ class SongHitPredictor:
         
         original_prob = orig_pred['hit_probability']
 
-        # Get optimal ranges
-        optimal_ranges = self.get_optimal_ranges()
-        if not optimal_ranges:
-            return []
-            
+        # Since we use global 20-point scanning, we do not need pre-computed optimal ranges
+        # Also, self.df is None in production API, so get_optimal_ranges() returns None.
         suggestions = []
 
         # Suggest features that can be tweaked in the Interactive Hit Playground
@@ -734,16 +731,31 @@ class SongHitPredictor:
             'acousticness', 'danceability', 'valence', 'speechiness', 'instrumentalness'
         ]
         
+        # Determine feature importances from model for the UI labels
+        importance_dict = {}
+        importance_df = self.get_feature_importance()
+        if importance_df is not None:
+            # Scale importances
+            max_imp = importance_df['importance'].max()
+            for _, row in importance_df.iterrows():
+                feat = row['feature']
+                imp = row['importance']
+                if imp > 0.1 or (max_imp > 0 and imp / max_imp > 0.5):
+                    importance_dict[feat] = "VERY IMPORTANT"
+                elif imp > 0.05 or (max_imp > 0 and imp / max_imp > 0.2):
+                    importance_dict[feat] = "IMPORTANT"
+                else:
+                    importance_dict[feat] = "NORMAL"
+
         for feature in self.musical_dna_features:
-            if feature not in original_features.columns or feature not in optimal_ranges:
+            if feature not in original_features.columns:
                 continue
                 
             if feature not in mutable_features:
                 continue
 
             current_value = original_features[feature].iloc[0]
-            optimal_range = optimal_ranges[feature]
-            optimal_val = optimal_range['optimal_value']
+            feature_importance_label = importance_dict.get(feature, "NORMAL")
             
             # Test improvement by moving towards optimal value
             test_features = original_features.copy()
@@ -805,7 +817,7 @@ class SongHitPredictor:
                     'improvement': float(best_improvement),
                     'improvement_percent': max(0.1, float(best_improvement * 100)),
                     'new_probability': float(best_new_prob),
-                    'importance': optimal_range['importance']
+                    'importance': feature_importance_label
                 })
 
         # Sort by improvement potential
