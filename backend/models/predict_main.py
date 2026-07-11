@@ -31,15 +31,12 @@ from scipy import stats
 import warnings
 import logging
 
-# LSTM imports
 try:
-    import tensorflow as tf
-    from tensorflow import keras
-    from tensorflow.keras import layers, models
-    from tensorflow.keras.optimizers import Adam
-    TENSORFLOW_AVAILABLE = True
+    import joblib
 except ImportError:
-    TENSORFLOW_AVAILABLE = False
+    pass
+
+TENSORFLOW_AVAILABLE = False
 
 warnings.filterwarnings('ignore')
 
