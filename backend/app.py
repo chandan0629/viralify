@@ -251,7 +251,8 @@ def extract_audio_features(audio_file):
     
     try:
         # Load audio file with optimal settings for feature extraction
-        y, sr = librosa.load(audio_file, sr=22050, mono=True)
+        # OPTIMIZED: Only load the "Golden 60 seconds" (0:15 - 1:15) to prevent 512MB RAM crashes on Render
+        y, sr = librosa.load(audio_file, sr=22050, mono=True, offset=15.0, duration=60.0)
         
         if len(y) == 0:
             raise ValueError("Empty audio file")
@@ -682,8 +683,8 @@ def analyze_audio():
         import soundfile as sf
         true_duration_sec = sf.info(temp_path).duration
         
-        # Load full audio so mutation and hook analysis can use the whole song
-        y_full, sr = librosa.load(temp_path, sr=22050, mono=True)
+        # Load audio (OPTIMIZED: Only load 60 seconds to prevent 512MB RAM OOM crashes)
+        y_full, sr = librosa.load(temp_path, sr=22050, mono=True, offset=15.0, duration=60.0)
         if len(y_full) == 0:
             raise ValueError("Empty audio file")
             
@@ -1532,12 +1533,12 @@ def main():
         check_for_updates()
         logger.info("="*60)
         logger.info("Starting Flask API server...")
-        logger.info(f"API running on http://0.0.0.0:5000")
+        logger.info(f"API running on http://0.0.0.0:7860")
         logger.info("Frontend: http://localhost:5173")
         logger.info("="*60)
         
         # Start Flask server
-        port = int(os.environ.get('PORT', os.environ.get('FLASK_PORT', 5000)))
+        port = int(os.environ.get('PORT', 7860))
         app.run(host='0.0.0.0', port=port, debug=False, threaded=True)
     
     except Exception as e:
