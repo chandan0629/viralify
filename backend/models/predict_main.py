@@ -748,54 +748,46 @@ class SongHitPredictor:
             # Test improvement by moving towards optimal value
             test_features = original_features.copy()
 
-            # Realistic limits for how much we can reasonably suggest changing a song
-            max_deltas = {
-                'tempo': current_value * 0.25 if current_value > 0 else 25.0, # Max 25% tempo shift
-                'loudness': 8.0, # Max 8dB shift
-                'key': 4.0, # Max 4 semitones
-                'energy': 0.30,
-                'liveness': 0.30,
-                'acousticness': 0.40,
-                'danceability': 0.30,
-                'valence': 0.30,
-                'speechiness': 0.20,
-                'instrumentalness': 0.30
-            }
-            
-            max_delta = max_deltas.get(feature, 0.20)
-            
-            # We want to find the best possible improvement within the max_delta range
-            # We will test both INCREASE and DECREASE directions with small steps
+            # We want to find the absolute best possible improvement for this feature by scanning its entire allowed range
             best_improvement = 0.0
             best_suggested_val = current_value
             best_direction = "OPTIMAL"
             best_new_prob = original_prob
             
-            steps = 8
-            step_size = max_delta / steps
+            scan_bounds = {
+                'tempo': (max(60.0, current_value - 40.0), min(200.0, current_value + 40.0)),
+                'loudness': (max(-20.0, current_value - 10.0), min(0.0, current_value + 10.0)),
+                'key': (0.0, 11.0),
+                'energy': (0.0, 1.0),
+                'liveness': (0.0, 1.0),
+                'acousticness': (0.0, 1.0),
+                'danceability': (0.0, 1.0),
+                'valence': (0.0, 1.0),
+                'speechiness': (0.0, 1.0),
+                'instrumentalness': (0.0, 1.0)
+            }
             
-            for direction_sign in [1, -1]:
-                for step in range(1, steps + 1):
-                    test_val = current_value + (direction_sign * step * step_size)
+            bounds = scan_bounds.get(feature, (0.0, 1.0))
+            
+            # Scan 20 points across the feature's entire allowed range
+            steps = 20
+            step_size = (bounds[1] - bounds[0]) / steps if steps > 0 else 0
+            
+            for step in range(steps + 1):
+                test_val = bounds[0] + (step * step_size)
+                
+                # Enforce integers for key
+                if feature == 'key':
+                    test_val = round(test_val)
                     
-                    # Clamp to reasonable bounds if needed (mostly relying on max_delta)
-                    # For things like loudness, keep it < 0
-                    if feature == 'loudness':
-                        test_val = min(test_val, 0.0)
-                    elif feature != 'tempo' and feature != 'loudness':
-                        # Most features are 0 to 1
-                        test_val = max(0.0, min(test_val, 1.0))
-                    else:
-                        test_val = max(0.0, test_val)
-                        
-                    test_features[feature] = test_val
-                    new_pred = self.predict_song_hit_probability(test_features)
+                test_features[feature] = test_val
+                new_pred = self.predict_song_hit_probability(test_features)
+                
+                if new_pred:
+                    test_prob = new_pred['hit_probability']
+                    improvement = test_prob - original_prob
                     
-                    if new_pred:
-                        test_prob = new_pred['hit_probability']
-                        improvement = test_prob - original_prob
-                        
-                        if improvement > best_improvement:
+                    if improvement > best_improvement:
                             best_improvement = improvement
                             best_suggested_val = test_val
                             best_new_prob = test_prob
