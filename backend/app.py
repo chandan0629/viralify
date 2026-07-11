@@ -773,27 +773,16 @@ def analyze_audio():
         elif harmonic_ratio < 0.4:
             speech_score += 0.2
             
-        # Threshold raised from 2.0 to 3.0 - requires multiple indicators
+        # Threshold raised from 2.0 to 4.0 - requires multiple strong indicators
         # Music with vocals alone won't trigger (speechiness ~0.3-0.4)
-        is_speech = speech_score >= 3.0        
+        is_speech = speech_score >= 4.0        
         # Get prescriptive suggestions for improvement
         prescriptions = []
         warning = None
         if is_speech:
-            result['hit_probability'] = float(np.random.uniform(0.01, 0.05))
-            result['is_hit_prediction'] = False
-            result['confidence'] = 0.95
+            # Still warn about speech, but use actual model prediction instead of random
             warning = "Spoken Word Detected: The uploaded audio sounds like normal conversation or spoken word rather than music. This prediction model is optimized for music tracks."
-            prescriptions = [{
-                'feature': 'energy',
-                'direction': 'INCREASE',
-                'current': features.get('energy', 0.5),
-                'suggested': 0.8,
-                'improvement_percent': 15.0,
-                'improvement': 0.15,
-                'new_probability': 0.20,
-                'importance': 'VERY IMPORTANT'
-            }]
+            prescriptions = []
         else:
             prescriptions = predictor.suggest_feature_improvements(features)
             if not prescriptions:
