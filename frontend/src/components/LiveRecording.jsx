@@ -285,8 +285,10 @@ export default function LiveRecording() {
   const applyConsultantTweaks = () => {
     if (!result || !result.prescriptions) return;
     let newFeatures = { ...playgroundFeatures };
+    let totalImprovement = 0;
     result.prescriptions.forEach(rec => {
       newFeatures[rec.feature] = rec.suggested;
+      totalImprovement += rec.improvement_percent || 0;
     });
     setPlaygroundFeatures(newFeatures);
     
@@ -299,11 +301,16 @@ export default function LiveRecording() {
     }).then(res => res.json()).then(data => {
       setPlaygroundScore(scaleScore(data.hit_probability, result.hit_probability));
       setPlaygroundLoading(false);
-    }).catch(() => setPlaygroundLoading(false));
+      generateMutatedAudio(newFeatures);
+    }).catch(() => {
+      setPlaygroundLoading(false);
+      generateMutatedAudio(newFeatures);
+    });
   };
 
-  const generateMutatedAudio = async () => {
+  const generateMutatedAudio = async (overrideFeatures = null) => {
     if (!result || !result.analysisId) return;
+    const featuresToUse = overrideFeatures || playgroundFeatures;
     
     setMutatingAudio(true);
     setError(null);
@@ -313,12 +320,12 @@ export default function LiveRecording() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           analysisId: result.analysisId,
-          target_tempo: playgroundFeatures.tempo,
-          target_key: playgroundFeatures.key,
-          target_loudness: playgroundFeatures.loudness,
-          target_energy: playgroundFeatures.energy,
-          target_liveness: playgroundFeatures.liveness,
-          target_acousticness: playgroundFeatures.acousticness,
+          target_tempo: featuresToUse.tempo,
+          target_key: featuresToUse.key,
+          target_loudness: featuresToUse.loudness,
+          target_energy: featuresToUse.energy,
+          target_liveness: featuresToUse.liveness,
+          target_acousticness: featuresToUse.acousticness,
           original_tempo: result.features.tempo,
           original_key: result.features.key,
           original_loudness: result.features.loudness,
@@ -657,8 +664,8 @@ export default function LiveRecording() {
                       </div>
                     </div>
                     {result.prescriptions && result.prescriptions.length > 0 && (
-                      <button className="btn primary snap-btn" onClick={applyConsultantTweaks}>
-                        ✨ Apply Consultant Tweaks
+                      <button className="btn primary snap-btn" onClick={applyConsultantTweaks} disabled={mutatingAudio}>
+                        ✨ Apply Consultant Tweaks (+{result.prescriptions.reduce((sum, rec) => sum + (rec.improvement_percent || 0), 0).toFixed(1)}%)
                       </button>
                     )}
                   </div>
