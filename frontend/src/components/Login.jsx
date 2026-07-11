@@ -3,7 +3,7 @@ import { GoogleLogin, useGoogleLogin } from '@react-oauth/google'
 import { jwtDecode } from 'jwt-decode'
 import './Auth.css'
 
-const BACKEND_URL = import.meta.env.VITE_API_URL || 'https://viralify-backend-li673hdf6q-uc.a.run.app';
+const BACKEND_URL = import.meta.env.VITE_API_URL || 'https://viralify-backend-506139712110.us-central1.run.app';
 
 export default function Login({ onLogin, onSwitchToSignup, isDarkMode, onToggleTheme }) {
   const [formData, setFormData] = useState({

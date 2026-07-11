@@ -28,7 +28,7 @@ export default function LiveRecording() {
   const timerRef = useRef(null);
   const reportRef = useRef(null);
 
-  const BACKEND_URL = import.meta.env.VITE_API_URL || 'https://viralify-backend-li673hdf6q-uc.a.run.app';
+  const BACKEND_URL = import.meta.env.VITE_API_URL || 'https://viralify-backend-506139712110.us-central1.run.app';
 
   useEffect(() => {
     return () => {

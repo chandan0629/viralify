@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Settings, Cpu, CheckCircle, Database, AlertCircle, Zap, ShieldCheck } from 'lucide-react'
 import './ModelSettings.css'
 
-const BACKEND_URL = import.meta.env.VITE_API_URL || 'https://viralify-backend-li673hdf6q-uc.a.run.app'
+const BACKEND_URL = import.meta.env.VITE_API_URL || 'https://viralify-backend-506139712110.us-central1.run.app'
 
 export default function ModelSettings() {
   const [modelInfo, setModelInfo] = useState(null)
