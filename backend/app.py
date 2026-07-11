@@ -978,12 +978,20 @@ def analyze_hooks():
         golden_hook = {**golden, 'type': 'Golden Hook', 'description': 'Best overall viral potential (Chorus)'}
         top_hooks.append(golden_hook)
         
+        # Rhythm candidates: preferably non-overlapping with golden hook
         rhythm_cands = [s for s in temporal_segments if not is_overlapping(s, golden_hook)]
+        
+        # Fallback if song is too short: just pick any other segment
+        if not rhythm_cands:
+            rhythm_cands = [s for s in temporal_segments if s['start_time'] != golden_hook['start_time']]
+            
         if rhythm_cands:
             rhythm = max(rhythm_cands, key=lambda x: x['rhythm_score'])
             top_hooks.append({**rhythm, 'hook_score': rhythm['rhythm_score'], 'type': 'Rhythm Hook', 'description': 'Most engaging & steady rhythm'})
             
-            drop_cands = [s for s in rhythm_cands if not is_overlapping(s, rhythm)]
+            # High-Energy drop: allow partial overlap but must be a different segment
+            drop_cands = [s for s in temporal_segments if s['start_time'] != golden_hook['start_time'] and s['start_time'] != rhythm['start_time']]
+            
             if drop_cands:
                 drop = max(drop_cands, key=lambda x: x['high_energy_score'])
                 top_hooks.append({**drop, 'hook_score': drop['high_energy_score'], 'type': 'High-Energy Drop', 'description': 'Biggest energy spike / drop'})
