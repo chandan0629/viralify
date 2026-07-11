@@ -781,12 +781,14 @@ class SongHitPredictor:
                     test_val = round(test_val)
                     
                 test_features[feature] = test_val
+                # print(f"Testing {feature}={test_val} -> {new_pred}")
                 new_pred = self.predict_song_hit_probability(test_features)
                 
                 if new_pred:
                     test_prob = new_pred['hit_probability']
                     improvement = test_prob - original_prob
                     
+                    logger.info(f"Feature {feature} at {test_val}: prob={test_prob}, impr={improvement}")
                     if improvement > best_improvement:
                         best_improvement = improvement
                         best_suggested_val = test_val
