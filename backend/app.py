@@ -72,12 +72,12 @@ logger = logging.getLogger(__name__)
 
 # Get paths
 BACKEND_DIR = Path(__file__).parent
-MODELS_DIR = BACKEND_DIR / 'models'
-DATA_DIR = BACKEND_DIR.parent / 'datasets'
+MODELS_DIR = Path(os.environ.get('MODEL_DIR', BACKEND_DIR / 'models'))
+DATA_DIR = Path(os.environ.get('DATA_DIR', BACKEND_DIR / 'data'))
 
 # Ensure directories exist
-MODELS_DIR.mkdir(exist_ok=True)
-DATA_DIR.mkdir(exist_ok=True)
+MODELS_DIR.mkdir(parents=True, exist_ok=True)
+DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 # Flask app setup
 from flask.json.provider import DefaultJSONProvider
@@ -570,9 +570,15 @@ def root():
 @app.route('/api/health', methods=['GET'])
 def health():
     """Health check endpoint"""
+    if not _model_loaded:
+        load_model_globally()
+
     return jsonify({
         'status': 'ok',
         'model_loaded': model is not None,
+        'model_type': current_model_type,
+        'audio_processing': 'enabled' if LIBROSA_AVAILABLE else 'disabled',
+        'audio_mutation': 'enabled' if PEDALBOARD_AVAILABLE else 'disabled',
         'version': '1.0.0'
     })
 
@@ -742,28 +748,34 @@ def analyze_audio():
         # Robust Acoustic Heuristic for Speech Classification
         silence_ratio = features.get('silence_ratio', 0.0)
         harmonic_ratio = all_features.get('harmonic_ratio', 0.0)
+        speechiness = features.get('speechiness', 0.0)
         
         speech_score = 0.0
         
-        # 1. Speech has natural pauses between words (high silence ratio)
-        if silence_ratio > 0.15:
-            speech_score += 1.5
-        elif silence_ratio > 0.10:
-            speech_score += 0.5
-            
-        # 2. Speech has very low harmonic content compared to music
-        if harmonic_ratio < 0.5:
-            speech_score += 1.0
-        elif harmonic_ratio < 0.7:
-            speech_score += 0.5
-            
-        # 3. Consonants produce high zero-crossing rates
-        if zcr_factor > 0.5:
+        # IMPROVED: Only trigger for extreme speech/podcast cases
+        # Music with vocals (speechiness ~0.3-0.4) should NOT be flagged
+        
+        # 1. High speechiness is key indicator - only count if > 0.5
+        if speechiness > 0.6:
+            speech_score += 2.0
+        elif speechiness > 0.5:
             speech_score += 1.0
             
-        # Threshold for speech is 2.0 out of 3.5 total possible points
-        # This completely removes the flawed absolute energy threshold
-        is_speech = speech_score >= 2.0        
+        # 2. Speech has natural pauses between words (high silence ratio)
+        if silence_ratio > 0.25:  # Raised from 0.15 to reduce false positives
+            speech_score += 1.0
+        elif silence_ratio > 0.20:
+            speech_score += 0.3
+            
+        # 3. Speech has very low harmonic content compared to music
+        if harmonic_ratio < 0.3:
+            speech_score += 0.5
+        elif harmonic_ratio < 0.4:
+            speech_score += 0.2
+            
+        # Threshold raised from 2.0 to 3.0 - requires multiple indicators
+        # Music with vocals alone won't trigger (speechiness ~0.3-0.4)
+        is_speech = speech_score >= 3.0        
         # Get prescriptive suggestions for improvement
         prescriptions = []
         warning = None
@@ -1556,7 +1568,7 @@ def main():
         logger.info("="*60)
         
         # Use combined dataset from data pipeline
-        combined_data_path = BACKEND_DIR / 'data' / 'combined_dataset.csv'
+        combined_data_path = DATA_DIR / 'combined_dataset.csv'
         
         # Fallback to individual datasets if combined doesn't exist
         if combined_data_path.exists():
@@ -1617,6 +1629,10 @@ def main():
         import traceback
         traceback.print_exc()
         raise
+
+
+if os.environ.get('EAGER_LOAD_MODEL', 'true').lower() in ('1', 'true', 'yes'):
+    load_model_globally()
 
 
 if __name__ == '__main__':
