@@ -801,15 +801,15 @@ class SongHitPredictor:
                             best_new_prob = test_prob
                             best_direction = "INCREASE" if direction_sign == 1 else "DECREASE"
                             
-            # Only suggest if it actually provides a meaningful positive improvement
-            if best_improvement > 0.001:
+            # Show any positive improvement, no matter how small, so the user has options
+            if best_improvement > 0.0:
                 suggestions.append({
                     'feature': feature,
                     'current': float(current_value),
                     'suggested': float(best_suggested_val),
                     'direction': best_direction,
                     'improvement': float(best_improvement),
-                    'improvement_percent': float(best_improvement * 100),
+                    'improvement_percent': max(0.1, float(best_improvement * 100)),
                     'new_probability': float(best_new_prob),
                     'importance': optimal_range['importance']
                 })
