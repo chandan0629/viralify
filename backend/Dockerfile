@@ -22,8 +22,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
-# Expose port 7860 (required by Hugging Face Spaces)
-EXPOSE 7860
+# Expose port
+EXPOSE 5000
 
-# Start server using Gunicorn on port 7860
-CMD sh -c "gunicorn --bind 0.0.0.0:7860 --timeout 300 --workers 1 --threads 2 --access-logfile - app:app"
+# Start server using Gunicorn (reads $PORT dynamically for platforms like Render/Heroku)
+CMD sh -c "gunicorn --bind 0.0.0.0:${PORT:-5000} --timeout 300 --workers 1 --threads 2 --access-logfile - app:app"
