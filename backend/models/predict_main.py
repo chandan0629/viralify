@@ -31,12 +31,15 @@ from scipy import stats
 import warnings
 import logging
 
+# LSTM imports
 try:
-    import joblib
+    import tensorflow as tf
+    from tensorflow import keras
+    from tensorflow.keras import layers, models
+    from tensorflow.keras.optimizers import Adam
+    TENSORFLOW_AVAILABLE = True
 except ImportError:
-    pass
-
-TENSORFLOW_AVAILABLE = False
+    TENSORFLOW_AVAILABLE = False
 
 warnings.filterwarnings('ignore')
 
@@ -153,25 +156,21 @@ class SongHitPredictor:
             # Try ensemble first (best performance)
             if model_type == "ensemble" or model_type == "xgboost":
                 ensemble_xgb_path = os.path.join(self.model_dir, "ensemble_xgb.pkl")
+                ensemble_rf_path = os.path.join(self.model_dir, "ensemble_rf.pkl")
+                ensemble_lr_path = os.path.join(self.model_dir, "ensemble_lr.pkl")
                 ensemble_scaler_path = os.path.join(self.model_dir, "ensemble_scaler.pkl")
                 ensemble_features_path = os.path.join(self.model_dir, "ensemble_features.pkl")
                 ensemble_metadata_path = os.path.join(self.model_dir, "ensemble_metadata.json")
                 
-                if os.path.exists(ensemble_xgb_path):
+                if all(os.path.exists(p) for p in [ensemble_xgb_path, ensemble_rf_path, ensemble_lr_path]):
                     self.xgb_model = joblib.load(ensemble_xgb_path)
-                    
-                    # RF and LR models are intentionally bypassed to prevent 512MB RAM crashes
-                    self.rf_model = None
-                    self.lr_model = None
-                    
-                    if os.path.exists(ensemble_scaler_path):
-                        self.ensemble_scaler = joblib.load(ensemble_scaler_path)
-                    if os.path.exists(ensemble_features_path):
-                        self.feature_names = joblib.load(ensemble_features_path)
-                    
+                    self.rf_model = joblib.load(ensemble_rf_path)
+                    self.lr_model = joblib.load(ensemble_lr_path)
+                    self.ensemble_scaler = joblib.load(ensemble_scaler_path)
+                    self.feature_names = joblib.load(ensemble_features_path)
                     self.model_type = "ensemble"
                     
-                    # Also load LSTM model if available
+                    # Also load LSTM model if available for the 4-model ensemble
                     try:
                         import tensorflow as tf
                         from tensorflow import keras
@@ -180,9 +179,9 @@ class SongHitPredictor:
                         if os.path.exists(lstm_model_path) and os.path.exists(lstm_scaler_path):
                             self.lstm_model = keras.models.load_model(lstm_model_path)
                             self.lstm_scaler = joblib.load(lstm_scaler_path)
-                            logger.info("  Loaded LSTM model companion")
+                            logger.info("  Included LSTM in ensemble (4 models)")
                     except Exception as e:
-                        logger.warning(f"Could not load LSTM model: {e}")
+                        logger.error(f"  Could not load LSTM into ensemble: {e}")
                     
                     
                     if os.path.exists(ensemble_metadata_path):
@@ -513,7 +512,7 @@ class SongHitPredictor:
         """Predict the hit probability of a single song"""
         # Check if we have a valid model (either single model or ensemble)
         if self.model_type == "ensemble":
-            if self.xgb_model is None:
+            if self.xgb_model is None or self.rf_model is None or self.lr_model is None:
                 logger.error("Ensemble models not loaded!")
                 return None
         elif self.model is None:
@@ -606,11 +605,37 @@ class SongHitPredictor:
         return df
 
     def _predict_ensemble(self, song_df):
-        """Ensemble prediction optimized for XGBoost only due to RAM constraints."""
+        """Ensemble prediction with weighted voting + percentile calibration + positive bias."""
         try:
-            # We bypass the massive RF and LR models to fit in Render's 512MB free tier
-            xgb_proba = float(self.xgb_model.predict_proba(song_df)[:, 1][0])
-            raw_prob = xgb_proba
+            # Get predictions from tree models
+            xgb_proba = self.xgb_model.predict_proba(song_df)[:, 1][0]
+            rf_proba = self.rf_model.predict_proba(song_df)[:, 1][0]
+            
+            # Scale for logistic regression
+            if self.ensemble_scaler is None:
+                logger.error("Ensemble scaler is None!")
+                return self._predict_xgboost(song_df)
+            
+            song_scaled = self.ensemble_scaler.transform(song_df)
+            lr_proba = self.lr_model.predict_proba(song_scaled)[:, 1][0]
+            
+            # LSTM prediction (if loaded)
+            if self.lstm_model is not None and self.lstm_scaler is not None:
+                lstm_scaled = self.lstm_scaler.transform(song_df)
+                song_lstm = lstm_scaled.reshape((lstm_scaled.shape[0], lstm_scaled.shape[1], 1))
+                lstm_prob = float(self.lstm_model.predict(song_lstm, verbose=0)[0][0])
+                
+                # Weighted average: XGB 40%, RF 30%, LR 15%, LSTM 15%
+                raw_prob = 0.40 * xgb_proba + 0.30 * rf_proba + 0.15 * lr_proba + 0.15 * lstm_prob
+                
+                # Confidence based on model agreement
+                model_std = float(abs(xgb_proba - raw_prob) + abs(rf_proba - raw_prob) + abs(lr_proba - raw_prob) + abs(lstm_prob - raw_prob)) / 4
+            else:
+                # Weighted average: XGB 50%, RF 33%, LR 17%
+                raw_prob = 0.50 * xgb_proba + 0.33 * rf_proba + 0.17 * lr_proba
+                
+                # Confidence based on model agreement
+                model_std = float(abs(xgb_proba - raw_prob) + abs(rf_proba - raw_prob) + abs(lr_proba - raw_prob)) / 3
             
             # ── Ensemble probability scaling ──────────────────────────────────
             # S-curve stretch to make predictions more decisive/confident
@@ -627,9 +652,11 @@ class SongHitPredictor:
             
             is_hit = calibrated_prob >= 0.50
             
+            agreement = 1 - min(model_std * 3, 1.0)
+            
             # Confidence base on distance from 0.5, heavily boosted
             base_confidence = abs(calibrated_prob - 0.50) * 2
-            confidence = (base_confidence ** 0.5) * 0.95 + 0.15
+            confidence = (base_confidence ** 0.5) * agreement * 0.95 + 0.15
             confidence = min(max(confidence, 0.40), 0.99)
             
             return calibrated_prob, confidence, is_hit
