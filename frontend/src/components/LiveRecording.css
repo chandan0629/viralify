@@ -58,7 +58,7 @@
 }
 
 [data-theme="dark"] .timer {
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
 .audio-preview {
@@ -77,7 +77,7 @@
 
 .btn.danger {
   background: linear-gradient(135deg, #ff3366, #ff0033);
-  color: white;
+  color: var(--text-primary);
   border: none;
 }
 

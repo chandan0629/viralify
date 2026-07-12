@@ -175,6 +175,7 @@
 
 .artist-avatar {
   position: relative;
+  flex-shrink: 0;
   width: 80px;
   height: 80px;
   border-radius: 50%;
@@ -220,7 +221,7 @@
 
 .artist-card.selected .checkmark-badge {
   background-color: #f43f8e;
-  color: white;
+  color: var(--text-primary);
   transform: scale(1);
 }
 
@@ -335,7 +336,7 @@
 
 .continue-button.active {
   background: linear-gradient(to right, #f43f8e, #8b5cf6);
-  color: white;
+  color: var(--text-primary);
   box-shadow: 0 0 20px rgba(244, 63, 142, 0.4);
   cursor: pointer;
 }

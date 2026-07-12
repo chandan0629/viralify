@@ -147,7 +147,7 @@ button {
 
 .btn-primary {
   background: linear-gradient(135deg, var(--primary), var(--secondary));
-  color: white;
+  color: var(--text-primary);
   padding: 0.8rem 1.8rem;
   border-radius: 8px;
   font-weight: 600;
@@ -233,7 +233,7 @@ button {
 .hover-glow:hover {
   box-shadow: 0 0 20px rgba(100, 181, 246, 0.4);
   border-color: var(--accent);
-  color: white;
+  color: var(--text-primary);
 }
 
 /* Navbar */
@@ -309,7 +309,7 @@ button {
 
 .nav-btn-signup {
   background: linear-gradient(135deg, var(--primary), var(--secondary));
-  color: white;
+  color: var(--text-primary);
   padding: 0.6rem 1.5rem;
   border-radius: 8px;
   font-weight: 700;
@@ -362,7 +362,7 @@ button {
   font-weight: 800;
   line-height: 1.1;
   margin-bottom: 1.5rem;
-  color: white;
+  color: var(--text-primary);
 }
 
 .hero-content p {
@@ -492,7 +492,7 @@ button {
   transform: translate(-50%, -50%);
   font-size: 1.2rem;
   font-weight: bold;
-  color: white;
+  color: var(--text-primary);
 }
 .score-text span { font-size: 0.7rem; }
 
@@ -646,7 +646,7 @@ button {
 }
 
 .about-card strong {
-  color: white;
+  color: var(--text-primary);
 }
 
 /* How It Works - Premium Overhaul */
@@ -706,7 +706,7 @@ button {
   font-size: 3.5rem;
   font-weight: 800;
   margin: 0 auto 1rem;
-  color: white;
+  color: var(--text-primary);
   text-align: center;
   width: 100%;
 }
@@ -798,7 +798,7 @@ button {
 .step-card h3 {
   font-size: 1.25rem;
   font-weight: 700;
-  color: white;
+  color: var(--text-primary);
   margin-bottom: 0.8rem;
   min-height: 2.5rem; /* Title takes 2 lines max roughly to keep uniform */
   display: flex;
@@ -927,7 +927,7 @@ button {
   font-size: 3.5rem;
   font-weight: 800;
   margin: 0 auto 1rem;
-  color: white;
+  color: var(--text-primary);
   text-align: center;
   width: 100%;
 }
@@ -1046,7 +1046,7 @@ button {
 .feature-card h4 {
   font-size: 1.25rem;
   margin-bottom: 0.8rem;
-  color: white;
+  color: var(--text-primary);
   font-weight: 700;
 }
 
@@ -1297,7 +1297,7 @@ button {
 .footer-links h4 {
   font-size: 1.1rem;
   margin-bottom: 1.5rem;
-  color: white;
+  color: var(--text-primary);
 }
 
 .footer-links a {
@@ -1332,7 +1332,7 @@ button {
   font-size: 3.5rem;
   font-weight: 800;
   margin: 0 auto 1rem;
-  color: white;
+  color: var(--text-primary);
   text-align: center;
   width: 100%;
 }
@@ -1447,7 +1447,7 @@ button {
 
 .mock-dash-title {
   font-weight: 700;
-  color: white;
+  color: var(--text-primary);
   font-size: 1.2rem;
 }
 
@@ -1458,7 +1458,7 @@ button {
 }
 
 .md-label { color: var(--text-secondary); margin-bottom: 0.2rem; }
-.md-value { color: white; font-weight: 600; }
+.md-value { color: var(--text-primary); font-weight: 600; }
 .md-success { color: #4ade80; text-shadow: 0 0 10px rgba(74, 222, 128, 0.4); }
 
 .mock-dash-body {
@@ -1516,7 +1516,7 @@ button {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  color: white;
+  color: var(--text-primary);
   display: flex;
   align-items: baseline;
 }
@@ -1550,7 +1550,7 @@ button {
   color: var(--text-secondary);
 }
 
-.m-feat-header span:last-child { color: white; font-weight: 600; }
+.m-feat-header span:last-child { color: var(--text-primary); font-weight: 600; }
 
 .m-feat-bar {
   width: 100%;
@@ -1628,7 +1628,7 @@ button {
 }
 
 .gh-label { color: var(--accent); font-weight: 700; }
-.gh-time { color: white; }
+.gh-time { color: var(--text-primary); }
 .gh-strength { color: var(--text-secondary); }
 
 .mock-dash-bottom {
@@ -1660,7 +1660,7 @@ button {
 .about-v-heading {
   font-size: 2.5rem;
   font-weight: 800;
-  color: white;
+  color: var(--text-primary);
   margin-bottom: 1.5rem;
   line-height: 1.2;
 }
@@ -1698,7 +1698,7 @@ button {
 }
 
 .ahl-content h5 {
-  color: white;
+  color: var(--text-primary);
   font-size: 1.05rem;
   font-weight: 700;
   margin: 0 0 0.5rem 0;
@@ -1741,7 +1741,7 @@ button {
 
 .premium-cta-btn {
   background: linear-gradient(90deg, var(--primary), var(--accent));
-  color: white;
+  color: var(--text-primary);
   border: none;
   padding: 1.2rem 2.5rem;
   font-size: 1.1rem;
@@ -1811,7 +1811,7 @@ button {
 .faq-question h4 {
   font-size: 1.15rem;
   font-weight: 600;
-  color: white;
+  color: var(--text-primary);
   margin: 0;
   line-height: 1.4;
 }
@@ -1933,7 +1933,7 @@ button {
 /* Navbar Auth Styles */
 .nav-btn-login {
   background: transparent;
-  color: white;
+  color: var(--text-primary);
   border: none;
   font-weight: 600;
   padding: 10px 20px;
@@ -1942,7 +1942,7 @@ button {
 
 .nav-btn-signup {
   background: linear-gradient(135deg, #EC4899, #8B5CF6);
-  color: white;
+  color: var(--text-primary);
   border: none;
   font-weight: 600;
   padding: 10px 24px;

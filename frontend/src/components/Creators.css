@@ -117,7 +117,7 @@
 
 .role-badge {
   background: linear-gradient(135deg, #ff7ab6, #f093fb);
-  color: white;
+  color: var(--text-primary);
   padding: 8px 16px;
   border-radius: 50px;
   font-size: 0.9rem;
@@ -127,7 +127,7 @@
 
 .creator-info h3 {
   font-size: 2rem;
-  color: #ffffff;
+  color: var(--text-primary);
   margin-bottom: 5px;
 }
 
@@ -146,7 +146,7 @@
 }
 
 .expertise-section h4 {
-  color: #ffffff;
+  color: var(--text-primary);
   font-size: 1rem;
   margin-bottom: 12px;
   text-transform: uppercase;
@@ -209,7 +209,7 @@
 .social-link:hover {
   background: linear-gradient(135deg, #ff7ab6, #667eea);
   border-color: #ff7ab6;
-  color: white;
+  color: var(--text-primary);
   transform: translateY(-3px);
   box-shadow: 0 5px 20px rgba(255, 122, 182, 0.3);
 }
@@ -221,7 +221,7 @@
 
 .section-title {
   font-size: 2rem;
-  color: #ffffff;
+  color: var(--text-primary);
   text-align: center;
   margin-bottom: 50px;
   text-shadow: 0 0 20px rgba(255, 122, 182, 0.2);
@@ -260,7 +260,7 @@
 
 .feature-card h4 {
   font-size: 1.2rem;
-  color: #ffffff;
+  color: var(--text-primary);
   margin-bottom: 10px;
   font-weight: 600;
 }
@@ -409,7 +409,7 @@
 
 .contact-section h3 {
   font-size: 2rem;
-  color: #ffffff;
+  color: var(--text-primary);
   margin-bottom: 10px;
 }
 
@@ -446,7 +446,7 @@
 
 .btn.primary {
   background: linear-gradient(135deg, #ff7ab6, #f093fb);
-  color: white;
+  color: var(--text-primary);
   border: 1px solid rgba(255, 122, 182, 0.5);
 }
 

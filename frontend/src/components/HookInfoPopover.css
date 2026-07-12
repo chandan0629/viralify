@@ -22,7 +22,7 @@
 
 .info-btn:hover, .info-btn.pinned {
   background: var(--accent, #1DB954);
-  color: #fff;
+  color: var(--text-primary);
   border-color: var(--accent, #1DB954);
   box-shadow: 0 0 10px rgba(29, 185, 84, 0.4);
 }
@@ -77,7 +77,7 @@
 }
 
 .close-btn:hover {
-  color: #fff;
+  color: var(--text-primary);
 }
 
 .info-panel-content {
@@ -137,7 +137,7 @@
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 0.8rem;
-  color: #fff;
+  color: var(--text-primary);
 }
 
 .calc-box {
@@ -168,7 +168,7 @@
 .insight-text {
   margin: 0;
   font-size: 0.9rem;
-  color: #fff;
+  color: var(--text-primary);
   font-style: italic;
 }
 
@@ -180,7 +180,7 @@
 }
 
 .edu-section h5 {
-  color: #fff;
+  color: var(--text-primary);
 }
 
 .edu-section p {

@@ -244,7 +244,7 @@ body {
 
 .auth-button.primary {
   background: linear-gradient(135deg, var(--color-accent), var(--color-accent-secondary));
-  color: white;
+  color: var(--text-primary);
   box-shadow: var(--shadow-button);
 }
 
@@ -367,7 +367,7 @@ body {
   height: 20px;
   border: 3px solid rgba(255,255,255,0.3);
   border-radius: 50%;
-  border-top-color: #fff;
+  border-top-color: var(--text-primary);
   animation: spin 1s ease-in-out infinite;
 }
 
@@ -437,7 +437,7 @@ body {
   padding: 2rem;
   border-radius: 16px;
   border: 1px solid rgba(236, 72, 153, 0.3);
-  color: #fff;
+  color: var(--text-primary);
   max-width: 500px;
 }
 
@@ -517,7 +517,7 @@ body {
 .clean-form-container h2 {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--text-primary);
   margin-bottom: 0.5rem;
 }
 
@@ -533,7 +533,7 @@ body {
   border-radius: 12px;
   border: 1px solid rgba(236, 72, 153, 0.3);
   background-color: rgba(15, 23, 36, 0.6);
-  color: #ffffff;
+  color: var(--text-primary);
   font-size: 1rem;
   margin-bottom: 1rem;
   transition: all 0.2s ease;
@@ -550,7 +550,7 @@ body {
   padding: 1rem;
   border-radius: 12px;
   background: linear-gradient(135deg, #ec4899, #d946ef);
-  color: white;
+  color: var(--text-primary);
   font-size: 1rem;
   font-weight: 600;
   border: none;

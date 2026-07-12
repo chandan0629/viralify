@@ -192,7 +192,7 @@ input[type="file"] {
 .file-input-button {
   display: inline-block;
   background: linear-gradient(135deg, var(--primary, #ff7ab6), var(--secondary, #667eea));
-  color: white;
+  color: var(--text-primary);
   padding: 12px 36px;
   border-radius: 8px;
   cursor: pointer;
@@ -292,7 +292,7 @@ input[type="file"] {
 
 .btn.primary {
   background: linear-gradient(135deg, var(--primary, #333), var(--secondary, #667eea));
-  color: white;
+  color: var(--text-primary);
   border: none;
   box-shadow: 0 8px 20px rgba(255, 122, 182, 0.3);
 }
@@ -846,13 +846,17 @@ input[type="file"] {
 .mfcc-bars {
   display: flex;
   align-items: flex-end;
-  justify-content: space-between;
+  justify-content: flex-start;
   height: 100px;
   gap: 4px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  -webkit-overflow-scrolling: touch;
 }
 
 .mfcc-bar-container {
   flex: 1;
+  min-width: 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -881,6 +885,9 @@ input[type="file"] {
   font-size: 12px;
   color: var(--text-secondary, #888);
   line-height: 1.6;
+  max-width: 100%;
+  box-sizing: border-box;
+  word-wrap: break-word;
 }
 
 /* Responsive Design */

@@ -39,7 +39,7 @@
   margin: 0;
   font-size: 1.4rem;
   font-weight: 600;
-  color: #fff;
+  color: var(--text-primary);
 }
 
 .active-model-display {
@@ -52,7 +52,7 @@
 .model-badge-large {
   background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(236, 72, 153, 0.2));
   border: 1px solid rgba(245, 158, 11, 0.4);
-  color: #fff;
+  color: var(--text-primary);
   padding: 15px 30px;
   border-radius: 12px;
   font-size: 1.5rem;
@@ -71,7 +71,7 @@
 .model-btn {
   background: rgba(255,255,255,0.02);
   border: 1px solid rgba(255,255,255,0.1);
-  color: #fff;
+  color: var(--text-primary);
   padding: 16px 20px;
   border-radius: 12px;
   font-weight: 600;
@@ -84,7 +84,7 @@
 .model-btn.active {
   background: rgba(59, 130, 246, 0.15);
   border-color: rgba(59, 130, 246, 0.4);
-  color: #fff;
+  color: var(--text-primary);
   box-shadow: inset 0 0 15px rgba(59, 130, 246, 0.1);
 }
 
@@ -119,7 +119,7 @@
 .meta-value {
   font-size: 1.3rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-primary);
 }
 
 .glow-text-blue {
