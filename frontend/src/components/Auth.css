@@ -414,10 +414,44 @@ body {
 .auth-left-pane {
   flex: 1;
   display: flex;
+  flex-direction: column;
+  position: relative;
+  align-items: stretch;
+  justify-content: flex-start;
+  padding: var(--space-2xl);
+  background: transparent;
+}
+
+.auth-form-wrapper {
+  flex: 1;
+  display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
-  background: transparent;
+  width: 100%;
+}
+
+/* Back Button Styles */
+.back-btn {
+  align-self: flex-start;
+  margin-bottom: var(--space-lg);
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 14px;
+  font-weight: 600;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  z-index: 100;
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-primary);
 }
 
 .auth-right-pane {

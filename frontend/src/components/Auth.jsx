@@ -72,25 +72,27 @@ export default function Auth({ onLogin, initialIsLogin = true, onBack }) {
       <div className={`auth-split-wrapper ${isDarkMode ? 'dark-mode' : 'light-mode'}`}>
         <div className="auth-left-pane">
           {onBack && (
-            <button onClick={onBack} className="back-btn" style={{ background: 'none', border: 'none', color: isDarkMode ? '#aaa' : '#666', cursor: 'pointer', padding: '10px 0', display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <button onClick={onBack} className="back-btn">
               ← Back
             </button>
           )}
-          {isLogin ? (
-            <Login 
-              onLogin={handleLogin} 
-              onSwitchToSignup={switchToSignup}
-              isDarkMode={isDarkMode}
-              onToggleTheme={toggleTheme}
-            />
-          ) : (
-            <Signup 
-              onSignup={handleSignup} 
-              onSwitchToLogin={switchToLogin}
-              isDarkMode={isDarkMode}
-              onToggleTheme={toggleTheme}
-            />
-          )}
+          <div className="auth-form-wrapper">
+            {isLogin ? (
+              <Login 
+                onLogin={handleLogin} 
+                onSwitchToSignup={switchToSignup}
+                isDarkMode={isDarkMode}
+                onToggleTheme={toggleTheme}
+              />
+            ) : (
+              <Signup 
+                onSignup={handleSignup} 
+                onSwitchToLogin={switchToLogin}
+                isDarkMode={isDarkMode}
+                onToggleTheme={toggleTheme}
+              />
+            )}
+          </div>
         </div>
         
         <div className="auth-right-pane" style={{ backgroundImage: "url('/auth-bg.png')" }}>

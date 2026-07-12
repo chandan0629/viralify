@@ -742,9 +742,7 @@
   width: 100%;
 }
 
-.home-page,
-.live-page,
-.info-page {
+.home-page {
   display: grid;
   grid-template-columns: 1fr 350px;
   gap: var(--space-xl);
@@ -772,9 +770,7 @@
 
 @media (max-width: 1024px) {
   .static-content,
-  .home-page,
-  .live-page,
-  .info-page {
+  .home-page {
     grid-template-columns: 1fr;
   }
 

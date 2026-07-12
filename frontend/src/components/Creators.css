@@ -1,7 +1,7 @@
 .creators {
   width: 100%;
   padding: var(--space-xl) var(--space-md);
-  background: var(--dark-bg);
+  background: transparent;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -55,14 +55,14 @@
 
 .creators-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: var(--space-xl);
   margin-bottom: var(--space-2xl);
   width: 100%;
 }
 
 .creator-card {
-  background: linear-gradient(135deg, rgba(50, 40, 120, 0.4) 0%, rgba(80, 50, 140, 0.3) 100%);
+  background: var(--card-bg);
   border: 1px solid rgba(255, 122, 182, 0.2);
   border-radius: 16px;
   padding: var(--space-xl);
@@ -133,13 +133,13 @@
 
 .creator-title {
   font-size: 1.1rem;
-  color: #ff7ab6;
+  color: var(--primary);
   margin-bottom: var(--space-md);
   font-weight: 600;
 }
 
 .creator-bio {
-  color: #b0b0d0;
+  color: var(--text-secondary);
   line-height: 1.6;
   margin-bottom: var(--space-lg);
   font-size: 1rem;
@@ -234,7 +234,7 @@
 }
 
 .feature-card {
-  background: linear-gradient(135deg, rgba(50, 40, 120, 0.3) 0%, rgba(80, 50, 140, 0.2) 100%);
+  background: var(--card-bg);
   border: 1px solid rgba(102, 126, 234, 0.3);
   border-radius: 15px;
   padding: var(--space-xl);
@@ -246,9 +246,8 @@
 
 .feature-card:hover {
   border-color: rgba(255, 122, 182, 0.5);
-  background: linear-gradient(135deg, rgba(60, 50, 130, 0.4) 0%, rgba(100, 60, 150, 0.3) 100%);
   transform: translateY(-10px);
-  box-shadow: 0 10px 30px rgba(255, 122, 182, 0.2);
+  box-shadow: 0 15px 30px rgba(255, 122, 182, 0.15);
 }
 
 .feature-icon {
@@ -283,7 +282,7 @@
 }
 
 .stack-card {
-  background: linear-gradient(135deg, rgba(100, 181, 246, 0.15) 0%, rgba(255, 122, 182, 0.1) 100%);
+  background: var(--card-bg);
   border: 1px solid rgba(100, 181, 246, 0.3);
   border-radius: 15px;
   padding: var(--space-lg);
@@ -293,15 +292,13 @@
 }
 
 .stack-card:hover {
-  border-color: rgba(255, 122, 182, 0.5);
-  background: linear-gradient(135deg, rgba(100, 181, 246, 0.2) 0%, rgba(255, 122, 182, 0.15) 100%);
   transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(100, 181, 246, 0.2);
+  border-color: rgba(255, 122, 182, 0.4);
 }
 
 .stack-category {
   font-size: 1.1rem;
-  color: #64b5f6;
+  color: var(--accent);
   margin-bottom: var(--space-md);
   font-weight: 600;
   text-transform: uppercase;
@@ -315,7 +312,7 @@
 }
 
 .tech-list li {
-  color: #b0b0d0;
+  color: var(--text-secondary);
   margin-bottom: var(--space-sm);
   display: flex;
   align-items: center;
@@ -333,11 +330,10 @@
 
 /* About Section */
 .about-section {
-  margin-bottom: var(--space-3xl);
-  background: linear-gradient(135deg, rgba(50, 40, 120, 0.3) 0%, rgba(80, 50, 140, 0.2) 100%);
-  border: 1px solid rgba(255, 122, 182, 0.2);
-  border-radius: 20px;
-  padding: var(--space-2xl) var(--space-xl);
+  background: var(--card-bg);
+  border: 1px solid rgba(100, 181, 246, 0.2);
+  border-radius: 15px;
+  padding: var(--space-xl);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 }
@@ -348,14 +344,14 @@
 }
 
 .about-content p {
-  color: #b0b0d0;
+  color: var(--text-secondary);
   line-height: 1.8;
   margin-bottom: var(--space-md);
   font-size: 1rem;
 }
 
 .about-content strong {
-  color: #ff7ab6;
+  color: var(--primary);
   font-weight: 600;
 }
 
@@ -384,14 +380,14 @@
 .stat-value {
   display: block;
   font-size: 2rem;
-  color: #ff7ab6;
+  color: var(--primary);
   font-weight: 700;
   margin-bottom: var(--space-sm);
 }
 
 .stat-label {
   display: block;
-  color: #a0a0c0;
+  color: var(--text-secondary);
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -399,12 +395,12 @@
 
 /* Contact Section */
 .contact-section {
-  text-align: center;
-  padding: var(--space-xl);
-  background: linear-gradient(135deg, rgba(100, 181, 246, 0.1) 0%, rgba(255, 122, 182, 0.1) 100%);
+  width: 100%;
+  max-width: 1000px;
+  background: var(--card-bg);
   border: 1px solid rgba(255, 122, 182, 0.3);
   border-radius: 20px;
-  margin-bottom: var(--space-xl);
+  padding: var(--space-2xl) var(--space-xl);
 }
 
 .contact-section h3 {
@@ -414,7 +410,7 @@
 }
 
 .contact-section p {
-  color: #a0a0c0;
+  color: var(--text-secondary);
   margin-bottom: var(--space-xl);
   font-size: 1.1rem;
 }

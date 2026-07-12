@@ -101,7 +101,7 @@ export default function Layout({ score, logs, onResult, user, onLogout }) {
               className={`menu-link ${currentPage === 'home' ? 'active' : ''}`}
               onClick={() => navigate('home')}
             >
-              Home
+              Dashboard
             </button>
           </li>
 
