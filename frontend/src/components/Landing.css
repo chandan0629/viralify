@@ -1928,6 +1928,7 @@ button {
     gap: 0.5rem;
     align-items: flex-start;
   }
+}
 
 /* Navbar Auth Styles */
 .nav-btn-login {
@@ -2041,8 +2042,8 @@ button {
   font-size: 1.1rem;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .nav-auth { display: none; }
+  .nav-links { display: none; }
   .mobile-menu-toggle { display: flex; }
-}
 }
