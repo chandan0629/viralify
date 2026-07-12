@@ -694,7 +694,7 @@ export default function LiveRecording() {
                     </div>
                     {result.prescriptions && result.prescriptions.length > 0 && (
                       <button className="btn primary snap-btn" onClick={applyConsultantTweaks} disabled={mutatingAudio}>
-                        ✨ Apply Consultant Tweaks (+{result.prescriptions.reduce((sum, rec) => sum + (rec.improvement_percent || 0), 0).toFixed(1)}%)
+                        ✨ Apply Consultant Tweaks (+{(result.combined_improvement_percent !== undefined ? result.combined_improvement_percent : result.prescriptions.reduce((sum, rec) => sum + (rec.improvement_percent || 0), 0)).toFixed(1)}%)
                       </button>
                     )}
                   </div>

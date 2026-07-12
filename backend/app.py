@@ -796,6 +796,17 @@ def analyze_audio():
                     'new_probability': result['hit_probability'] + 0.01,
                     'importance': 'MINOR'
                 }]
+        # Calculate the true combined improvement percentage
+        combined_improvement_percent = 0.0
+        if prescriptions:
+            test_df = pd.DataFrame([features])
+            for p in prescriptions:
+                test_df[p['feature']] = p['suggested']
+            
+            combined_pred = predictor.predict_song_hit_probability(test_df)
+            if combined_pred:
+                combined_improvement = combined_pred['hit_probability'] - result['hit_probability']
+                combined_improvement_percent = max(0.0, float(combined_improvement * 100))
         
         return jsonify({
             'probability': result['hit_probability'],
@@ -806,6 +817,7 @@ def analyze_audio():
             'model_version': getattr(predictor, 'model_metadata', {}).get('version', '1.0.0'),
             'features': features,
             'suggestions': prescriptions,
+            'combined_improvement_percent': combined_improvement_percent,
             'total_duration_sec': true_duration_sec,
             'analysisId': analysis_id,
             'fileName': audio_file.filename,
@@ -1336,9 +1348,26 @@ def suggest_improvements():
         
         if suggestions is None:
             return jsonify({'error': 'Could not generate suggestions'}), 500
+            
+        combined_improvement_percent = 0.0
+        if suggestions:
+            # Calculate true combined improvement
+            test_df = pd.DataFrame([song_data])
+            # get original prediction
+            orig_pred = predictor.predict_song_hit_probability(test_df)
+            if orig_pred:
+                orig_prob = orig_pred['hit_probability']
+                for p in suggestions:
+                    test_df[p['feature']] = p['suggested']
+                
+                new_pred = predictor.predict_song_hit_probability(test_df)
+                if new_pred:
+                    combined_improvement = new_pred['hit_probability'] - orig_prob
+                    combined_improvement_percent = max(0.0, float(combined_improvement * 100))
         
         return jsonify({
-            'suggestions': suggestions
+            'suggestions': suggestions,
+            'combined_improvement_percent': combined_improvement_percent
         })
     
     except Exception as e:
