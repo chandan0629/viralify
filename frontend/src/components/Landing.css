@@ -113,7 +113,7 @@ body[data-theme="dark"] .landing-page {
   position: absolute;
   inset: -1px;
   border-radius: 17px;
-  padding: 1px;
+  padding: var(--space-xs);
   background: linear-gradient(135deg, rgba(255, 122, 182, 0.5), transparent, rgba(100, 181, 246, 0.5));
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
@@ -419,7 +419,7 @@ button {
 
 .mock-dots {
   display: flex;
-  gap: 6px;
+  gap: var(--space-sm);
 }
 
 .mock-dots span {
@@ -555,7 +555,7 @@ button {
 .mock-waveform {
   display: flex;
   align-items: flex-end;
-  gap: 4px;
+  gap: var(--space-xs);
   height: 60px;
   background: rgba(255,255,255,0.02);
   padding: 1rem;
@@ -723,8 +723,8 @@ button {
 .steps-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(260px, 1fr));
-  gap: 60px;
-  margin: 70px auto 40px; /* 70px spacing below subtitle */
+  gap: var(--space-3xl);
+  margin: var(--space-3xl) auto var(--space-xl); /* var(--space-3xl) spacing below subtitle */
   max-width: 1400px;
 }
 
@@ -865,7 +865,7 @@ button {
   justify-content: center;
   color: var(--primary);
   box-shadow: 0 0 10px rgba(255, 122, 182, 0.3);
-  margin: 0 -4px;
+  margin: 0 -var(--space-xs);
   z-index: 2;
   animation: pulse-node 3s infinite ease-in-out;
 }
@@ -899,7 +899,7 @@ button {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  gap: 6px;
+  gap: var(--space-sm);
   height: 80px;
   opacity: 0.08; /* Reduced opacity */
   pointer-events: none;
@@ -935,15 +935,15 @@ button {
 .features-wide-container {
   width: 100%;
   max-width: 1800px;
-  padding-left: 60px;
-  padding-right: 60px;
+  padding-left: var(--space-3xl);
+  padding-right: var(--space-3xl);
   margin: 0 auto;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 640px) {
   .features-wide-container {
-    padding-left: 20px;
-    padding-right: 20px;
+    padding-left: var(--space-md);
+    padding-right: var(--space-md);
   }
 }
 
@@ -958,7 +958,7 @@ button {
   display: flex;
   overflow-x: auto;
   scroll-behavior: smooth;
-  gap: 30px;
+  gap: var(--space-xl);
   padding: 0 0 2rem 0; 
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE/Edge */
@@ -1175,7 +1175,7 @@ button {
 .h-wave-visual {
   display: flex;
   align-items: flex-end;
-  gap: 4px;
+  gap: var(--space-xs);
   height: 100px;
 }
 
@@ -1340,7 +1340,7 @@ button {
 .about-viralify-grid {
   display: grid;
   grid-template-columns: 4.5fr 5.5fr; /* Fractional units prevent overflow while keeping 45/55 ratio */
-  gap: 10rem; /* Increased to ~160px for an even wider gap */
+  gap: 10rem; /* Increased to ~var(--space-3xl) for an even wider gap */
   width: 100%;
   max-width: 1500px; /* Reduced to 1500px to slightly shrink the dashboard size */
   margin: 4rem auto 0; /* Restored standard vertical margin */
@@ -1578,7 +1578,7 @@ button {
   overflow: hidden;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 640px) {
   .mock-dash-body {
     grid-template-columns: 1fr; /* Stack on mobile */
     gap: 1.5rem;
@@ -1597,7 +1597,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: var(--space-xs);
   height: 60px;
   width: 100%;
 }
@@ -1639,7 +1639,7 @@ button {
 
 .mini-eq {
   display: flex;
-  gap: 4px;
+  gap: var(--space-xs);
   height: 20px;
   align-items: flex-end;
 }
@@ -1894,7 +1894,7 @@ button {
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 640px) {
   .hero-content h1 { font-size: 2.8rem; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .nav-links { display: none; } /* Hide links on mobile */
@@ -1936,7 +1936,7 @@ button {
   color: var(--text-primary);
   border: none;
   font-weight: 600;
-  padding: 10px 20px;
+  padding: var(--space-sm) var(--space-md);
   cursor: pointer;
 }
 
@@ -1945,7 +1945,7 @@ button {
   color: var(--text-primary);
   border: none;
   font-weight: 600;
-  padding: 10px 24px;
+  padding: var(--space-sm) var(--space-lg);
   border-radius: 8px;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -1962,10 +1962,10 @@ button {
   background: transparent;
   border: none;
   cursor: pointer;
-  padding: 8px;
+  padding: var(--space-sm);
   z-index: 1001;
   flex-direction: column;
-  gap: 5px;
+  gap: var(--space-sm);
 }
 
 .mobile-menu-toggle span {
@@ -2022,7 +2022,7 @@ button {
   font-size: 1.2rem;
   font-weight: 500;
   text-align: left;
-  padding: 10px 0;
+  padding: var(--space-sm) 0;
   cursor: pointer;
 }
 

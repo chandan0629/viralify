@@ -5,7 +5,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 16px;
+  padding: var(--space-md);
   font-family: inherit;
 }
 
@@ -14,21 +14,21 @@
   max-width: 672px;
   background-color: #0d2818;
   border-radius: 16px;
-  padding: 24px;
+  padding: var(--space-lg);
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   border: 1px solid #163325;
 }
 
 @media (min-width: 768px) {
   .favorite-artists-container {
-    padding: 40px;
+    padding: var(--space-xl);
   }
 }
 
 .progress-bar {
   display: flex;
-  gap: 8px;
-  margin-bottom: 32px;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xl);
 }
 
 .progress-segment {
@@ -43,7 +43,7 @@
 }
 
 .step-header {
-  margin-bottom: 32px;
+  margin-bottom: var(--space-xl);
 }
 
 .step-label {
@@ -52,14 +52,14 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  margin-bottom: 12px;
+  margin-bottom: var(--space-sm);
 }
 
 .step-title {
   font-size: 30px;
   font-weight: 700;
   color: #f4f4f0;
-  margin-bottom: 12px;
+  margin-bottom: var(--space-sm);
 }
 
 @media (min-width: 768px) {
@@ -75,7 +75,7 @@
 
 .search-container {
   position: relative;
-  margin-bottom: 40px;
+  margin-bottom: var(--space-xl);
 }
 
 .search-icon {
@@ -91,7 +91,7 @@
   background-color: #112d20;
   border: 1px solid #1a3828;
   border-radius: 12px;
-  padding: 14px 16px 14px 48px;
+  padding: var(--space-md) var(--space-md) var(--space-md) var(--space-2xl);
   color: #f4f4f0;
   font-size: 16px;
   transition: all 0.2s ease;
@@ -130,11 +130,11 @@
 .artist-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 40px 16px;
-  margin-bottom: 40px;
+  gap: var(--space-xl) var(--space-md);
+  margin-bottom: var(--space-xl);
   max-height: 40vh;
   overflow-y: auto;
-  padding-right: 8px;
+  padding-right: var(--space-sm);
 }
 
 @media (min-width: 768px) {
@@ -162,7 +162,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: var(--space-md);
   background: none;
   border: none;
   cursor: pointer;
@@ -211,7 +211,7 @@
   position: absolute;
   bottom: -4px;
   right: -4px;
-  padding: 4px;
+  padding: var(--space-xs);
   border-radius: 50%;
   border: 2px solid #0d2818;
   transition: transform 0.2s ease;
@@ -248,7 +248,7 @@
 
 .no-artists-found {
   grid-column: 1 / -1;
-  padding: 32px 0;
+  padding: var(--space-xl) 0;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -258,7 +258,7 @@
 .no-artists-found p {
   color: #9ca3a3;
   font-size: 18px;
-  margin-bottom: 12px;
+  margin-bottom: var(--space-sm);
 }
 
 .clear-search-btn {
@@ -278,7 +278,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-top: 32px;
+  padding-top: var(--space-xl);
   border-top: 1px solid #1a3828;
 }
 
@@ -290,8 +290,8 @@
   cursor: pointer;
   transition: color 0.2s ease;
   min-height: 44px;
-  padding: 8px 16px;
-  margin-left: -16px;
+  padding: var(--space-sm) var(--space-md);
+  margin-left: -var(--space-md);
 }
 
 .skip-button:hover, .skip-button:focus {
@@ -303,7 +303,7 @@
 .footer-actions {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: var(--space-md);
 }
 
 .remaining-needed {
@@ -323,12 +323,12 @@
 }
 
 .continue-button {
-  padding: 14px 32px;
+  padding: var(--space-md) var(--space-xl);
   border-radius: 8px;
   font-weight: 700;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-sm);
   transition: all 0.3s ease;
   border: none;
   min-height: 44px;

@@ -1,5 +1,5 @@
 .settings-container {
-  padding: 40px 20px;
+  padding: var(--space-xl) var(--space-md);
   max-width: 1200px;
   margin: 0 auto;
 }
@@ -7,14 +7,14 @@
 .settings-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 30px;
+  gap: var(--space-xl);
 }
 
 .glass-panel {
   background: rgba(20, 20, 35, 0.6);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.05);
-  padding: 30px;
+  padding: var(--space-xl);
   border-radius: 16px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   display: flex;
@@ -29,10 +29,10 @@
 .card-header {
   display: flex;
   align-items: center;
-  gap: 15px;
-  margin-bottom: 25px;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
   border-bottom: 1px solid rgba(255,255,255,0.05);
-  padding-bottom: 15px;
+  padding-bottom: var(--space-md);
 }
 
 .card-header h3 {
@@ -53,7 +53,7 @@
   background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(236, 72, 153, 0.2));
   border: 1px solid rgba(245, 158, 11, 0.4);
   color: var(--text-primary);
-  padding: 15px 30px;
+  padding: var(--space-md) var(--space-xl);
   border-radius: 12px;
   font-size: 1.5rem;
   font-weight: 800;
@@ -65,14 +65,14 @@
 .model-options {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-sm);
 }
 
 .model-btn {
   background: rgba(255,255,255,0.02);
   border: 1px solid rgba(255,255,255,0.1);
   color: var(--text-primary);
-  padding: 16px 20px;
+  padding: var(--space-md) var(--space-md);
   border-radius: 12px;
   font-weight: 600;
   font-size: 1rem;
@@ -96,14 +96,14 @@
 .metadata-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
+  gap: var(--space-md);
 }
 
 .meta-item {
   display: flex;
   flex-direction: column;
   background: rgba(0,0,0,0.3);
-  padding: 20px;
+  padding: var(--space-md);
   border-radius: 12px;
   border: 1px solid rgba(255,255,255,0.03);
 }
@@ -113,7 +113,7 @@
   color: rgba(255,255,255,0.5);
   text-transform: uppercase;
   letter-spacing: 1px;
-  margin-bottom: 8px;
+  margin-bottom: var(--space-sm);
 }
 
 .meta-value {

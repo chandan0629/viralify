@@ -12,10 +12,10 @@
   background: var(--card-bg, white);
   border: 2px dashed var(--primary, #ff7ab6);
   border-radius: 16px;
-  padding: 60px 30px;
+  padding: var(--space-3xl) var(--space-xl);
   text-align: center;
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  margin-bottom: 20px;
+  margin-bottom: var(--space-md);
   position: relative;
   overflow: hidden;
 }
@@ -30,12 +30,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: var(--space-md);
 }
 
 .record-icon {
   font-size: 4rem;
-  margin-bottom: 10px;
+  margin-bottom: var(--space-sm);
 }
 
 .record-icon.pulse {
@@ -54,7 +54,7 @@
   font-weight: 700;
   font-family: monospace;
   color: var(--text-primary, #1a1a1a);
-  margin: 10px 0;
+  margin: var(--space-sm) 0;
 }
 
 [data-theme="dark"] .timer {
@@ -65,7 +65,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: var(--space-md);
   width: 100%;
 }
 
@@ -87,13 +87,13 @@
 
 .action-buttons {
   display: flex;
-  gap: 15px;
-  margin-top: 10px;
+  gap: var(--space-md);
+  margin-top: var(--space-sm);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 640px) {
   .record-area {
-    padding: 30px 15px;
+    padding: var(--space-xl) var(--space-md);
   }
   .record-icon {
     font-size: 3rem;

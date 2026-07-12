@@ -50,7 +50,7 @@ body {
   align-items: center;
   justify-content: center;
   background: var(--bg-primary);
-  padding: 20px;
+  padding: var(--space-md);
   overflow: hidden;
   transition: background 0.4s ease;
 }
@@ -111,7 +111,7 @@ body {
   position: relative;
   z-index: 10;
   width: 100%;
-  max-width: 480px;
+  max-width: 640px;
 }
 
 .glassmorphism {
@@ -121,7 +121,7 @@ body {
   border: var(--glass-border);
   border-radius: 24px;
   box-shadow: var(--shadow-card);
-  padding: 40px;
+  padding: var(--space-xl);
   color: var(--color-text-primary);
   animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
@@ -136,13 +136,13 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: var(--space-lg);
 }
 
 .logo {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-sm);
 }
 
 .logo-icon {
@@ -164,13 +164,13 @@ body {
 
 .auth-header h2 {
   font-size: 28px;
-  margin: 0 0 8px 0;
+  margin: 0 0 var(--space-sm) 0;
   font-weight: 600;
 }
 
 .auth-header p {
   color: var(--color-text-secondary);
-  margin: 0 0 32px 0;
+  margin: 0 0 var(--space-xl) 0;
   font-size: 15px;
 }
 
@@ -178,7 +178,7 @@ body {
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: var(--space-md);
 }
 
 .floating-label {
@@ -187,7 +187,7 @@ body {
 
 .floating-label input {
   width: 100%;
-  padding: 18px 16px 10px 16px;
+  padding: var(--space-md) var(--space-md) var(--space-sm) var(--space-md);
   background: var(--bg-input);
   border: 1px solid var(--color-border);
   border-radius: 12px;
@@ -227,7 +227,7 @@ body {
 
 /* Button & Effects */
 .auth-button {
-  padding: 16px;
+  padding: var(--space-md);
   border-radius: 12px;
   border: none;
   font-size: 16px;
@@ -239,7 +239,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 10px;
+  margin-top: var(--space-sm);
 }
 
 .auth-button.primary {
@@ -287,7 +287,7 @@ body {
   display: flex;
   align-items: center;
   text-align: center;
-  margin: 24px 0;
+  margin: var(--space-lg) 0;
   color: var(--color-text-secondary);
   font-size: 14px;
 }
@@ -300,13 +300,13 @@ body {
 }
 
 .divider span {
-  padding: 0 10px;
+  padding: 0 var(--space-sm);
 }
 
 .google-auth-wrapper {
   display: flex;
   justify-content: center;
-  margin-bottom: 24px;
+  margin-bottom: var(--space-lg);
   border-radius: 12px;
   overflow: hidden;
   transition: transform 0.2s ease;
@@ -319,7 +319,7 @@ body {
 /* Footer Links */
 .auth-footer {
   text-align: center;
-  margin-top: 24px;
+  margin-top: var(--space-lg);
   color: var(--color-text-secondary);
   font-size: 15px;
 }
@@ -344,12 +344,12 @@ body {
 .error-message {
   background: rgba(255, 107, 107, 0.1);
   color: #ff6b6b;
-  padding: 14px;
+  padding: var(--space-md);
   border-radius: 12px;
-  margin-bottom: 24px;
+  margin-bottom: var(--space-lg);
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-sm);
   font-size: 14px;
   border: 1px solid rgba(255, 107, 107, 0.2);
   animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
@@ -376,7 +376,7 @@ body {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 8px;
+  padding: var(--space-sm);
 }
 .toggle-slider {
   width: 46px;
@@ -490,15 +490,15 @@ body {
     font-size: 2rem;
   }
   .clean-input {
-    padding: 12px 16px;
+    padding: var(--space-sm) var(--space-md);
     min-height: 44px;
   }
   .clean-button {
-    padding: 12px 16px;
+    padding: var(--space-sm) var(--space-md);
     min-height: 44px;
   }
   .social-btn {
-    padding: 10px;
+    padding: var(--space-sm);
     min-height: 44px;
   }
 }

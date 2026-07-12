@@ -3,7 +3,7 @@
 .recommendations {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 40px 20px;
+  padding: var(--space-xl) var(--space-md);
   animation: fadeIn 0.6s ease;
   width: 100%;
   display: flex;
@@ -14,7 +14,7 @@
 .recommendations-container {
   display: flex;
   flex-direction: column;
-  gap: 60px;
+  gap: var(--space-3xl);
   width: 100%;
 }
 
@@ -27,7 +27,7 @@
 
 .section-title {
   font-size: 40px;
-  margin-bottom: 40px;
+  margin-bottom: var(--space-xl);
   color: var(--text-primary);
   font-weight: 700;
   letter-spacing: -0.5px;
@@ -49,11 +49,11 @@
 
 .recommendations-grid {
   display: flex;
-  gap: 20px;
+  gap: var(--space-md);
   width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 20px 0;
+  padding: var(--space-md) 0;
   scroll-behavior: smooth;
   scroll-snap-type: x mandatory;
 }
@@ -81,7 +81,7 @@
   background: var(--card-bg);
   border: 1px solid rgba(255, 122, 182, 0.15);
   border-radius: 14px;
-  padding: 32px;
+  padding: var(--space-xl);
   text-align: center;
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   cursor: pointer;
@@ -104,7 +104,7 @@
 
 .recommendation-card h4 {
   font-size: 18px;
-  margin-bottom: 12px;
+  margin-bottom: var(--space-sm);
   color: var(--text-primary);
   font-weight: 600;
   letter-spacing: -0.3px;
@@ -114,12 +114,12 @@
   color: #8a8aaa;
   font-size: 14px;
   line-height: 1.6;
-  margin-bottom: 18px;
+  margin-bottom: var(--space-md);
 }
 
 .impact-badge {
   display: inline-block;
-  padding: 6px 12px;
+  padding: var(--space-sm) var(--space-sm);
   border-radius: 20px;
   font-size: 12px;
   font-weight: 600;
@@ -149,11 +149,11 @@
 
 .tips-grid {
   display: flex;
-  gap: 20px;
+  gap: var(--space-md);
   width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 20px 0;
+  padding: var(--space-md) 0;
   scroll-behavior: smooth;
   scroll-snap-type: x mandatory;
 }
@@ -181,7 +181,7 @@
   background: var(--card-bg);
   border: 1px solid rgba(102, 126, 234, 0.2);
   border-radius: 12px;
-  padding: 25px;
+  padding: var(--space-lg);
   transition: all 0.3s ease;
   flex: 0 0 calc(25% - 15px);
   min-width: 280px;
@@ -196,7 +196,7 @@
 
 .tip-category {
   font-size: 18px;
-  margin-bottom: 15px;
+  margin-bottom: var(--space-md);
   color: var(--secondary);
   font-weight: 700;
 }
@@ -209,8 +209,8 @@
 .tip-list li {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  margin-bottom: 12px;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
   color: var(--text-secondary);
   font-size: 14px;
   line-height: 1.5;
@@ -230,11 +230,11 @@
 
 .success-grid {
   display: flex;
-  gap: 20px;
+  gap: var(--space-md);
   width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 20px 0;
+  padding: var(--space-md) 0;
   scroll-behavior: smooth;
   scroll-snap-type: x mandatory;
 }
@@ -262,7 +262,7 @@
   background: linear-gradient(135deg, rgba(255, 122, 182, 0.1), rgba(102, 126, 234, 0.1));
   border: 1px solid rgba(255, 122, 182, 0.2);
   border-radius: 12px;
-  padding: 30px 20px;
+  padding: var(--space-xl) var(--space-md);
   text-align: center;
   transition: all 0.3s ease;
   flex: 0 0 calc(25% - 15px);
@@ -284,7 +284,7 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  margin-bottom: 12px;
+  margin-bottom: var(--space-sm);
 }
 
 .success-card p {
@@ -326,7 +326,7 @@
 
 /* ========== RESPONSIVE ========== */
 
-@media (max-width: 768px) {
+@media (max-width: 640px) {
   .section-title {
     font-size: 22px;
   }
@@ -334,19 +334,19 @@
   .recommendation-card {
     flex: 0 0 calc(50% - 10px);
     min-width: 250px;
-    padding: 24px;
+    padding: var(--space-lg);
   }
 
   .tip-card {
     flex: 0 0 calc(50% - 10px);
     min-width: 240px;
-    padding: 20px;
+    padding: var(--space-md);
   }
 
   .success-card {
     flex: 0 0 calc(50% - 10px);
     min-width: 200px;
-    padding: 24px 16px;
+    padding: var(--space-lg) var(--space-md);
   }
 
   .success-number {
@@ -354,7 +354,7 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 640px) {
   .section-title {
     font-size: 18px;
   }
@@ -362,23 +362,23 @@
   .recommendation-card {
     flex: 0 0 calc(100% - 10px);
     min-width: 280px;
-    padding: 20px;
+    padding: var(--space-md);
   }
 
   .tip-card {
     flex: 0 0 calc(100% - 10px);
     min-width: 260px;
-    padding: 16px;
+    padding: var(--space-md);
   }
 
   .success-card {
     flex: 0 0 calc(100% - 10px);
     min-width: 240px;
-    padding: 20px 12px;
+    padding: var(--space-md) var(--space-sm);
   }
 
   .recommendations-container {
-    gap: 30px;
+    gap: var(--space-xl);
   }
 
   .rec-icon {

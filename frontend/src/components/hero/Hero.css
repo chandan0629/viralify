@@ -6,7 +6,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 120px 0 60px;
+  padding: var(--space-3xl) 0 var(--space-3xl);
   overflow: hidden;
   background-color: var(--dark-bg);
 }
@@ -33,8 +33,8 @@
 .hero-badge {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
   border-radius: 50px;
   background: rgba(139, 92, 246, 0.1); /* Neon Purple */
   border: 1px solid rgba(139, 92, 246, 0.3);
@@ -42,14 +42,14 @@
   font-size: 0.875rem;
   font-weight: 600;
   width: fit-content;
-  margin-bottom: 24px;
+  margin-bottom: var(--space-lg);
 }
 
 .hero-title {
   font-size: 4rem;
   line-height: 1.1;
   font-weight: 800;
-  margin-bottom: 24px;
+  margin-bottom: var(--space-lg);
   color: var(--text-primary);
 }
 
@@ -65,23 +65,23 @@
   color: var(--text-secondary);
   max-width: 500px;
   line-height: 1.6;
-  margin-bottom: 32px;
+  margin-bottom: var(--space-xl);
 }
 
 .hero-actions {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 40px;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
 }
 
 .hero-btn-primary {
-  padding: 16px 32px;
+  padding: var(--space-md) var(--space-xl);
   font-size: 1.125rem;
   border-radius: 50px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-sm);
   background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
   border: none;
   color: var(--text-primary);
@@ -96,7 +96,7 @@
 }
 
 .hero-btn-secondary {
-  padding: 16px 32px;
+  padding: var(--space-md) var(--space-xl);
   font-size: 1.125rem;
   border-radius: 50px;
   background: rgba(255, 255, 255, 0.05);
@@ -113,13 +113,13 @@
 .hero-features {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-sm);
 }
 
 .hero-feature-item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-sm);
   color: #a78bfa;
   font-size: 0.95rem;
   font-weight: 500;
@@ -144,11 +144,11 @@
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
-  padding: 16px;
+  padding: var(--space-md);
   position: absolute;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--space-xs);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   z-index: 20;
 }
@@ -202,7 +202,7 @@
     transform: scale(0.6);
   }
   .hero-btn-primary, .hero-btn-secondary {
-    padding: 12px 24px;
+    padding: var(--space-sm) var(--space-lg);
     font-size: 1rem;
   }
 }
@@ -216,13 +216,13 @@
 .hero-features-row {
     display: flex;
     align-items: center;
-    gap: 32px;
+    gap: var(--space-xl);
 }
 .hero-feature-col {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
+    gap: var(--space-sm);
     color: #8B5CF6;
     font-size: 0.8rem;
     font-weight: 500;
@@ -230,7 +230,7 @@
 }
 .hero-feature-col .feature-icon {
     background: rgba(139, 92, 246, 0.1);
-    padding: 8px;
+    padding: var(--space-sm);
     border-radius: 8px;
 }
 .hero-btn-primary {
