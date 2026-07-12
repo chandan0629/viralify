@@ -95,7 +95,7 @@ export default function Auth({ onLogin, initialIsLogin = true, onBack }) {
         
         <div className="auth-right-pane" style={{ backgroundImage: "url('/auth-bg.png')" }}>
           <div className="auth-right-overlay">
-            <h2>ViraliFy</h2>
+            <h2>ViraliFY</h2>
             <p>
               Discover if your next track has what it takes to go viral. 
               Our advanced machine learning models analyze your audio DNA to predict its success 

@@ -25,7 +25,7 @@ body{margin:0;background:linear-gradient(180deg,#0a1f14 0%, #0d2818 100%);color:
 input[type=range]{width:100%}
 input[type=number]{padding:8px;border-radius:6px;border:none;background:#071828;color:#e6eef6}
 .actions{grid-column:1/-1;display:flex;gap:8px;margin-top:8px}
-.btn{padding:10px 12px;border-radius:8px;border:none;cursor:pointer;transition:all 0.2s}
+.btn{padding:12px 16px;min-height:44px;border-radius:8px;border:none;cursor:pointer;transition:all 0.2s}
 .btn.primary{background:linear-gradient(90deg,#ff6aa6,#ffb86b);color:#081221;font-weight:700}
 .btn.primary:disabled{opacity:0.5;cursor:not-allowed}
 .result{margin-top:12px}
@@ -64,8 +64,13 @@ input[type=number]{padding:8px;border-radius:6px;border:none;background:#071828;
 /* confetti */
 .confetti{position:fixed;left:50%;top:20%;transform:translateX(-50%);font-size:28px;pointer-events:none;z-index:9999}
 
-@media(max-width:900px){
+@media(max-width:1024px){
   .container{flex-direction:column}
-  .right{width:auto}
+  .right{width:100%}
   .compact-hub{max-width:100%}
+}
+
+@media(max-width:640px){
+  .container{padding:16px;}
+  .form-grid{grid-template-columns:1fr}
 }

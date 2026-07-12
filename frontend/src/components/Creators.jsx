@@ -6,16 +6,52 @@ export default function Creators() {
     {
       id: 1,
       name: 'Arin Karmakar',
-      title: 'Full Stack Developer & ML Engineer',
-      role: '👨‍💻 Lead Developer',
-      bio: 'Built the complete Song Virality Prediction system with AI/ML integration, React frontend, and Flask API. Expertise in machine learning, full-stack development, and blockchain integration.',
-      expertise: ['Python', 'React', 'Machine Learning', 'Flask', 'XGBoost', 'Blockchain'],
-      social: {
-        github: 'https://github.com/GODL0111',
-        linkedin: '#',
-        twitter: '#'
-      },
+      title: 'Data Mutation, Frontend, Backend',
+      role: 'Developer',
+      bio: 'Built the complete Song Virality Prediction system with AI/ML integration, React frontend, and Flask API.',
+      expertise: ['Data Mutation', 'Machine Learning', 'React', 'Flask'],
+      social: { github: 'https://github.com/GODL0111', linkedin: '#', twitter: '#' },
+      image: '👨‍💻'
+    }, 
+    {
+      id: 2,
+      name: 'Chandan Kumar Raj',
+      title: 'Data Collection, Frontend, Backend, Deployment',
+      role: 'Developer',
+      bio: 'Pioneered data collection strategies and developed both the intuitive frontend interfaces and robust backend architectures.',
+      expertise: ['Data Collection', 'Frontend', 'Backend', 'Full Stack'],
+      social: { github: 'https://github.com/chandan0629', linkedin: '#' },
       image: '👨‍💼'
+    },
+    {
+      id: 3,
+      name: 'Kumar Mridul',
+      title: 'Data Analysis, Testing, Backend',
+      role: 'Developer',
+      bio: 'Handled complex data analysis, ensured robust testing, built backend infrastructure, and managed seamless deployments.',
+      expertise: ['Data Analysis', 'Deployment', 'Testing', 'Backend'],
+      social: { github: 'https://github.com/Mridul-Srivastava03', linkedin: '#' },
+      image: '👨‍🔧'
+    },
+    {
+      id: 4,
+      name: 'Ragini Shaw',
+      title: 'Data Cross-validation, Frontend, Documentation',
+      role: 'Developer',
+      bio: 'Ensured data accuracy through cross-validation, crafted beautiful frontend components, and wrote extensive documentation.',
+      expertise: ['Cross-validation', 'Frontend', 'UI/UX', 'Documentation'],
+      social: { github: 'https://github.com/Ragini-Shaw06', linkedin: '#' },
+      image: '👩‍💻'
+    },
+    {
+      id: 5,
+      name: 'Nandini Singh',
+      title: 'Data Analysis, Research, Testing, Documentation',
+      role: 'Developer',
+      bio: 'Led the research initiatives, performed in-depth data analysis, maintained testing standards, and authored comprehensive docs.',
+      expertise: ['Data Analysis', 'Research', 'Testing', 'Documentation'],
+      social: { github: '#', linkedin: '#' },
+      image: '👩‍🔬'
     }
   ]
 
@@ -83,7 +119,7 @@ export default function Creators() {
     <div className="creators">
       <div className="page-header">
         <h2>👨‍💻 Meet the Creator</h2>
-        <p>Brilliant minds behind ViraliFy</p>
+        <p>Brilliant minds behind ViraliFY</p>
       </div>
 
       <div className="creators-container">
@@ -166,10 +202,10 @@ export default function Creators() {
 
         {/* About Project */}
         <section className="about-section">
-          <h3 className="section-title">About ViraliFy</h3>
+          <h3 className="section-title">About ViraliFY</h3>
           <div className="about-content">
             <p>
-              <strong>ViraliFy</strong> is an AI-powered platform that predicts whether a song will go viral
+              <strong>ViraliFY</strong> is an AI-powered platform that predicts whether a song will go viral
               using advanced machine learning algorithms and deep analysis of musical features.
             </p>
             <p>
@@ -177,7 +213,7 @@ export default function Creators() {
               UI, Flask for the API backend, and blockchain integration for Web3 capabilities.
             </p>
             <p>
-              Whether you're a music producer, artist, or music enthusiast, ViraliFy helps you understand
+              Whether you're a music producer, artist, or music enthusiast, ViraliFY helps you understand
               what makes a song successful and provides actionable recommendations for improvement.
             </p>
             <div className="project-stats">
@@ -194,8 +230,8 @@ export default function Creators() {
                 <span className="stat-label">Tech Stacks</span>
               </div>
               <div className="stat">
-                <span className="stat-value">1</span>
-                <span className="stat-label">Developer</span>
+                <span className="stat-value">5</span>
+                <span className="stat-label">Developers</span>
               </div>
             </div>
           </div>

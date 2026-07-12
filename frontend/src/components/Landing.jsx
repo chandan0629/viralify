@@ -147,11 +147,11 @@ export default function Landing({ onLogin }) {
         <div className="nav-container">
           <div className="nav-logo" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <AudioWaveform size={24} color="#EC4899" />
-            Viralify
+            ViraliFY
           </div>
           <nav className="nav-links">
             <button className={isScrolled ? '' : 'active'} onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); setMobileMenuOpen(false); }}>Home</button>
-            <button onClick={() => { scrollToSection('about'); setMobileMenuOpen(false); }}>Why Viralify</button>
+            <button onClick={() => { scrollToSection('about'); setMobileMenuOpen(false); }}>Why ViraliFY</button>
             <button onClick={() => { scrollToSection('about-viralify'); setMobileMenuOpen(false); }}>About</button>
             <button onClick={() => { scrollToSection('how-it-works'); setMobileMenuOpen(false); }}>Working</button>
             <button onClick={() => { scrollToSection('features'); setMobileMenuOpen(false); }}>Features</button>
@@ -177,7 +177,7 @@ export default function Landing({ onLogin }) {
         <div className={`mobile-nav-drawer ${mobileMenuOpen ? 'open' : ''}`}>
           <div className="mobile-nav-links">
             <button onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); setMobileMenuOpen(false); }}>Home</button>
-            <button onClick={() => { scrollToSection('about'); setMobileMenuOpen(false); }}>Why Viralify</button>
+            <button onClick={() => { scrollToSection('about'); setMobileMenuOpen(false); }}>Why ViraliFY</button>
             <button onClick={() => { scrollToSection('about-viralify'); setMobileMenuOpen(false); }}>About</button>
             <button onClick={() => { scrollToSection('how-it-works'); setMobileMenuOpen(false); }}>Working</button>
             <button onClick={() => { scrollToSection('features'); setMobileMenuOpen(false); }}>Features</button>
@@ -226,10 +226,10 @@ export default function Landing({ onLogin }) {
         <div className="container">
           <div className="about-card glass-card glow-border">
             <div className="about-icon"><Shield size={32} /></div>
-            <h2>Why Viralify?</h2>
+            <h2>Why ViraliFY?</h2>
             <p>
               Thousands of songs are released every day, making it difficult for artists to understand what drives success.
-              Viralify combines <strong>Artificial Intelligence, Digital Signal Processing, and Ensemble Machine Learning</strong> to
+              ViraliFY combines <strong>Artificial Intelligence, Digital Signal Processing, and Ensemble Machine Learning</strong> to
               analyze acoustic characteristics and estimate a song's viral potential. Instead of relying on guesswork,
               creators receive data-driven insights before releasing their music.
             </p>
@@ -237,7 +237,7 @@ export default function Landing({ onLogin }) {
         </div>
       </section>
 
-      {/* About Viralify Section */}
+      {/* About ViraliFY Section */}
       <section id="about-viralify" className={`about-viralify-section fade-up ${aboutViralifyVisible ? 'visible' : ''}`} ref={aboutViralifyRef}>
         <div className="container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', maxWidth: '1500px' }}>
           <div className="section-header text-center" style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -513,14 +513,14 @@ export default function Landing({ onLogin }) {
         <div className="container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
           <div className="section-header text-center" style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <h2>Frequently Asked <span className="text-gradient">Questions</span></h2>
-            <p className="subtitle-glow">Find quick answers about how Viralify works, our AI prediction process, and the platform's capabilities.</p>
+            <p className="subtitle-glow">Find quick answers about how ViraliFY works, our AI prediction process, and the platform's capabilities.</p>
           </div>
 
           <div className="faq-grid">
             {[
               {
-                q: "How does Viralify predict a song's viral potential?",
-                a: "Viralify analyzes acoustic features such as tempo, energy, danceability, loudness, and rhythm using Digital Signal Processing. These features are then evaluated by an Ensemble Machine Learning model to estimate the song's viral potential."
+                q: "How does ViraliFY predict a song's viral potential?",
+                a: "ViraliFY analyzes acoustic features such as tempo, energy, danceability, loudness, and rhythm using Digital Signal Processing. These features are then evaluated by an Ensemble Machine Learning model to estimate the song's viral potential."
               },
               {
                 q: "What audio formats are supported?",
@@ -532,15 +532,15 @@ export default function Landing({ onLogin }) {
               },
               {
                 q: "Which Machine Learning models are used?",
-                a: "Viralify uses an Ensemble Learning approach combining Random Forest, XGBoost, and Logistic Regression to improve prediction accuracy and reliability."
+                a: "ViraliFY uses an Ensemble Learning approach combining Random Forest, XGBoost, and Logistic Regression to improve prediction accuracy and reliability."
               },
               {
-                q: "Does Viralify store my uploaded songs?",
+                q: "Does ViraliFY store my uploaded songs?",
                 a: "No. Uploaded audio files are processed only for analysis and are not permanently stored, ensuring your music remains private and secure."
               },
               {
-                q: "Can Viralify help improve my song?",
-                a: "Yes. Along with the Virality Score, Viralify provides AI-powered insights, feature analysis, and recommendations to help improve your song before release."
+                q: "Can ViraliFY help improve my song?",
+                a: "Yes. Along with the Virality Score, ViraliFY provides AI-powered insights, feature analysis, and recommendations to help improve your song before release."
               }
             ].map((faq, i) => (
               <div
@@ -571,7 +571,7 @@ export default function Landing({ onLogin }) {
       <footer className="landing-footer">
         <div className="container footer-grid">
           <div className="footer-brand">
-            <div className="nav-logo">Viralify</div>
+            <div className="nav-logo">ViraliFY</div>
             <p>Empowering independent creators with data-driven musical insights.</p>
           </div>
           <div className="footer-links">

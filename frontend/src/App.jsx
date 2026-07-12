@@ -103,7 +103,7 @@ export default function App(){
 
   if (!mounted) {
     return <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#0a0a0a', color: 'white', flexDirection: 'column'}}>
-        <div style={{fontSize: '24px', marginBottom: '20px'}}>🎵 Loading Viralify...</div>
+        <div style={{fontSize: '24px', marginBottom: '20px'}}>🎵 Loading ViraliFY...</div>
         <div style={{width: '40px', height: '40px', border: '3px solid rgba(255,122,182,0.3)', borderTopColor: '#ff7ab6', borderRadius: '50%', animation: 'spin 1s linear infinite'}}></div>
         <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
       </div>

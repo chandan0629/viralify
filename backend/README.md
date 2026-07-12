@@ -1,5 +1,5 @@
 ---
-title: Viralify API
+title: ViraliFY API
 emoji: 🎵
 colorFrom: purple
 colorTo: pink
@@ -9,4 +9,4 @@ app_file: app.py
 pinned: false
 ---
 
-This is the backend for Viralify, running a Flask application.
+This is the backend for ViraliFY, running a Flask application.

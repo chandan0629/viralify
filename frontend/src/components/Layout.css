@@ -712,7 +712,7 @@
   }
 
   .main-content {
-    padding: 80px 15px 20px;
+    padding: 80px 16px 24px;
   }
 
   .page-header h2 {
@@ -744,7 +744,7 @@
 
 .home-page,
 .live-page,
-.recommend-page {
+.info-page {
   display: grid;
   grid-template-columns: 1fr 350px;
   gap: 30px;
@@ -774,7 +774,7 @@
   .static-content,
   .home-page,
   .live-page,
-  .recommend-page {
+  .info-page {
     grid-template-columns: 1fr;
   }
 
@@ -793,7 +793,7 @@
   }
 
   .main-content {
-    padding: 80px 15px 20px;
+    padding: 80px 16px 24px;
   }
 
   .page-header h2 {

@@ -3,7 +3,7 @@ import './Layout.css'
 
 // Lazy load components to avoid import errors
 const LiveSongTest = React.lazy(() => import('./LiveSongTest'))
-const Recommendations = React.lazy(() => import('./Recommendations'))
+const Info = React.lazy(() => import('./Info'))
 const Creators = React.lazy(() => import('./Creators'))
 const GameDashboard = React.lazy(() => import('./GameDashboard'))
 const LiveRecording = React.lazy(() => import('./LiveRecording'))
@@ -82,7 +82,7 @@ export default function Layout({ score, logs, onResult, user, onLogout }) {
       {/* Sidebar Menu */}
       <nav className={`sidebar ${menuOpen ? 'open' : ''}`}>
         <div className="menu-header">
-          <h1>ViraliFy</h1>
+          <h1>ViraliFY</h1>
           {user && (
             <div className="user-info">
               <div className="user-avatar">
@@ -123,10 +123,10 @@ export default function Layout({ score, logs, onResult, user, onLogout }) {
           </li>
           <li>
             <button 
-              className={`menu-link ${currentPage === 'recommend' ? 'active' : ''}`}
-              onClick={() => navigate('recommend')}
+              className={`menu-link ${currentPage === 'info' ? 'active' : ''}`}
+              onClick={() => navigate('info')}
             >
-              Recommendations
+              Info
             </button>
           </li>
           <li>
@@ -159,7 +159,7 @@ export default function Layout({ score, logs, onResult, user, onLogout }) {
         {currentPage === 'home' && (
           <div className="home-page">
             <div className="welcome-section">
-              <h1 className="title-3d">ViraliFy</h1>
+              <h1 className="title-3d">ViraliFY</h1>
               <p className="subtitle">Predict Your Song's Potential</p>
               <p className="description">
                 Use AI-powered machine learning to analyze your song's potential to go viral.
@@ -197,10 +197,10 @@ export default function Layout({ score, logs, onResult, user, onLogout }) {
           </div>
         )}
 
-        {currentPage === 'recommend' && (
-          <div className="recommend-page">
+        {currentPage === 'info' && (
+          <div className="info-page">
             <React.Suspense fallback={<div>Loading...</div>}>
-              <Recommendations />
+              <Info />
             </React.Suspense>
           </div>
         )}

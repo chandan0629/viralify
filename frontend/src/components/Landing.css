@@ -1322,9 +1322,9 @@ button {
   font-size: 0.9rem;
 }
 
-/* About Viralify Section */
+/* About ViraliFY Section */
 .about-viralify-section {
-  padding: 2rem 0 8rem 0; /* Reduced top padding to pull header closer to 'Why Viralify' */
+  padding: 2rem 0 8rem 0; /* Reduced top padding to pull header closer to 'Why ViraliFY' */
   position: relative;
 }
 
@@ -1884,7 +1884,7 @@ button {
     grid-template-columns: 1fr;
   }
 
-  /* About Viralify Responsive */
+  /* About ViraliFY Responsive */
   .about-viralify-grid {
     grid-template-columns: 1fr;
     gap: 4rem;
@@ -1906,7 +1906,7 @@ button {
     grid-template-columns: 1fr;
   }
 
-  /* About Viralify Mobile */
+  /* About ViraliFY Mobile */
   .about-highlights-grid {
     grid-template-columns: 1fr;
   }
@@ -1915,7 +1915,7 @@ button {
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 640px) {
   .stats-grid { grid-template-columns: 1fr; }
   .hero-actions { flex-direction: column; }
   .footer-grid { grid-template-columns: 1fr; }

@@ -1,7 +1,7 @@
 import React from 'react'
-import './Recommendations.css'
+import './Info.css'
 
-export default function Recommendations() {
+export default function Info() {
   const recommendations = [
     {
       id: 1,
@@ -83,7 +83,7 @@ export default function Recommendations() {
   return (
     <div className="recommendations">
       <div className="page-header">
-        <h2>Recommendations</h2>
+        <h2>Info</h2>
         <p>Get actionable insights to improve your song</p>
       </div>
 

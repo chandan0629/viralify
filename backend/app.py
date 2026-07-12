@@ -120,9 +120,9 @@ import sqlite3
 def get_app_data_dir():
     appdata = os.getenv('APPDATA')
     if appdata:
-        base_dir = Path(appdata) / 'ViraliFy'
+        base_dir = Path(appdata) / 'ViraliFY'
     else:
-        base_dir = Path.home() / '.config' / 'ViraliFy'
+        base_dir = Path.home() / '.config' / 'ViraliFY'
     
     # Ensure dirs exist
     base_dir.mkdir(parents=True, exist_ok=True)
