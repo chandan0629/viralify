@@ -315,12 +315,20 @@ export default function LiveSongTest({ onResult }) {
           target_energy: featuresToUse.energy,
           target_liveness: featuresToUse.liveness,
           target_acousticness: featuresToUse.acousticness,
+          target_speechiness: featuresToUse.speechiness,
+          target_valence: featuresToUse.valence,
+          target_danceability: featuresToUse.danceability,
+          target_instrumentalness: featuresToUse.instrumentalness,
           original_tempo: result.features.tempo,
           original_key: result.features.key,
           original_loudness: result.features.loudness,
           original_energy: result.features.energy,
           original_liveness: result.features.liveness,
-          original_acousticness: result.features.acousticness
+          original_acousticness: result.features.acousticness,
+          original_speechiness: result.features.speechiness,
+          original_valence: result.features.valence,
+          original_danceability: result.features.danceability,
+          original_instrumentalness: result.features.instrumentalness
         })
       });
       

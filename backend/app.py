@@ -53,7 +53,7 @@ except ImportError:
 
 try:
     import pedalboard
-    from pedalboard import Pedalboard, PitchShift, Gain, time_stretch, Distortion, Compressor, Reverb, LowpassFilter, HighpassFilter, Chorus
+    from pedalboard import Pedalboard, PitchShift, Gain, time_stretch, Distortion, Compressor, Reverb, LowpassFilter, HighpassFilter, Chorus, HighShelfFilter, LowShelfFilter
     PEDALBOARD_AVAILABLE = True
 except ImportError:
     PEDALBOARD_AVAILABLE = False
@@ -1084,6 +1084,8 @@ def mutate_audio():
             if n_steps > 6: n_steps -= 12
             elif n_steps < -6: n_steps += 12
 
+        plugins = []
+        
         if abs(rate - 1.0) > 0.02 or n_steps != 0:
             if PEDALBOARD_AVAILABLE:
                 y = time_stretch(y, sr, stretch_factor=float(rate), pitch_shift_in_semitones=float(n_steps))
@@ -1092,9 +1094,15 @@ def mutate_audio():
                     y = librosa.effects.time_stretch(y, rate=rate)
                 if n_steps != 0:
                     y = librosa.effects.pitch_shift(y, sr=sr, n_steps=n_steps)
+                    
+            # Time-stretching introduces phase smearing and loss of transients.
+            # Compensate slightly so we don't completely tank the 'danceability' and 'energy' ML features.
+            if abs(rate - 1.0) > 0.05:
+                # Add some punch back and restore high frequencies
+                plugins.append(Compressor(threshold_db=-15, ratio=2.5, attack_ms=2, release_ms=50))
+                plugins.append(HighShelfFilter(cutoff_frequency_hz=3000, gain_db=2.0))
                 
         # 3. DSP PLUGINS FOR ML FEATURES
-        plugins = []
         
         if target_loudness is not None:
             gain_db = target_loudness - original_loudness
@@ -1102,34 +1110,76 @@ def mutate_audio():
             if abs(gain_db) > 0.5:
                 plugins.append(Gain(gain_db=gain_db))
                 
-        # Energy -> Distortion + Compression or Lowpass
+        # Energy -> Subtle EQ and Compression
         if 'target_energy' in data and data['target_energy'] is not None:
             energy_delta = target_energy - original_energy
             if energy_delta > 0.03:
-                # More energy -> crunchier, highly compressed
-                plugins.append(Compressor(threshold_db=-20, ratio=8, attack_ms=2, release_ms=50))
-                plugins.append(Distortion(drive_db=min(25, energy_delta * 80)))
+                # More energy -> slight compression, boost highs subtly
+                plugins.append(Compressor(threshold_db=-15, ratio=2.5, attack_ms=5, release_ms=100))
+                plugins.append(HighShelfFilter(cutoff_frequency_hz=4000, gain_db=min(6.0, energy_delta * 15.0)))
+                plugins.append(Distortion(drive_db=min(3.0, energy_delta * 10.0))) # very slight saturation
             elif energy_delta < -0.03:
-                # Less energy -> muffled, cut highs aggressively
-                plugins.append(LowpassFilter(cutoff_frequency_hz=max(200, 8000 - (abs(energy_delta) * 15000))))
+                # Less energy -> cut highs slightly, no heavy muffling
+                plugins.append(HighShelfFilter(cutoff_frequency_hz=3000, gain_db=max(-6.0, energy_delta * 15.0)))
                 
-        # Liveness -> Reverb (needs to be aggressive to trick librosa)
+        # Liveness -> Subtle Reverb
         if 'target_liveness' in data and data['target_liveness'] is not None:
             liveness_delta = target_liveness - original_liveness
             if liveness_delta > 0.03:
-                plugins.append(Reverb(room_size=min(1.0, liveness_delta * 3.0), wet_level=min(0.9, liveness_delta * 2.5)))
+                plugins.append(Reverb(room_size=min(0.5, liveness_delta * 1.5), wet_level=min(0.4, liveness_delta * 1.0)))
                 
-        # Acousticness -> Highpass + Chorus + EQ
+        # Acousticness -> Gentle EQ adjustments
         if 'target_acousticness' in data and data['target_acousticness'] is not None:
             ac_delta = target_acousticness - original_acousticness
             if ac_delta > 0.03:
-                # More acoustic -> remove harsh subbass, add natural warmth and air
-                plugins.append(HighpassFilter(cutoff_frequency_hz=250))
-                plugins.append(Chorus(rate_hz=1.5, depth=0.2, centre_delay_ms=8.0))
+                # More acoustic -> roll off sub-bass slightly, subtle warmth
+                plugins.append(LowShelfFilter(cutoff_frequency_hz=150, gain_db=max(-4.0, -ac_delta * 10.0)))
+                plugins.append(Chorus(rate_hz=1.0, depth=0.1, centre_delay_ms=7.0))
             elif ac_delta < -0.03:
-                # More electronic -> heavy synthetic crunch
-                plugins.append(Distortion(drive_db=min(20, abs(ac_delta) * 60)))
-                plugins.append(Compressor(threshold_db=-15, ratio=4))
+                # More electronic -> slight saturation, boost low-end punch
+                plugins.append(LowShelfFilter(cutoff_frequency_hz=100, gain_db=min(4.0, abs(ac_delta) * 10.0)))
+                plugins.append(Distortion(drive_db=min(4.0, abs(ac_delta) * 12.0)))
+                plugins.append(Compressor(threshold_db=-10, ratio=2))
+
+        # Speechiness -> EQ vocal range (1kHz - 4kHz)
+        if 'target_speechiness' in data and data['target_speechiness'] is not None:
+            sp_delta = safe_float(data['target_speechiness']) - safe_float(data.get('original_speechiness', 0.5))
+            if sp_delta > 0.03:
+                # Boost vocal presence
+                plugins.append(HighShelfFilter(cutoff_frequency_hz=1500, gain_db=min(4.0, sp_delta * 15.0)))
+            elif sp_delta < -0.03:
+                # Scoop vocal presence
+                plugins.append(LowShelfFilter(cutoff_frequency_hz=3000, gain_db=max(-4.0, sp_delta * 15.0)))
+                
+        # Valence (Positivity/Mood) -> Warmth vs Brightness
+        if 'target_valence' in data and data['target_valence'] is not None:
+            val_delta = safe_float(data['target_valence']) - safe_float(data.get('original_valence', 0.5))
+            if val_delta > 0.03:
+                # Happier -> Brighter, slight chorus
+                plugins.append(HighShelfFilter(cutoff_frequency_hz=5000, gain_db=min(3.0, val_delta * 10.0)))
+                plugins.append(Chorus(rate_hz=2.0, depth=0.1, centre_delay_ms=5.0))
+            elif val_delta < -0.03:
+                # Sadder -> Warmer, subdued highs
+                plugins.append(HighShelfFilter(cutoff_frequency_hz=4000, gain_db=max(-4.0, val_delta * 10.0)))
+                
+        # Danceability -> Punchy transients vs smooth
+        if 'target_danceability' in data and data['target_danceability'] is not None:
+            dnc_delta = safe_float(data['target_danceability']) - safe_float(data.get('original_danceability', 0.5))
+            if dnc_delta > 0.03:
+                # More danceable -> punchy compression
+                plugins.append(Compressor(threshold_db=-18, ratio=4, attack_ms=1, release_ms=40))
+                plugins.append(LowShelfFilter(cutoff_frequency_hz=80, gain_db=min(3.0, dnc_delta * 10.0)))
+            elif dnc_delta < -0.03:
+                # Less danceable -> slower compression
+                plugins.append(Compressor(threshold_db=-12, ratio=2, attack_ms=30, release_ms=200))
+                
+        # Instrumentalness -> Muffle vocals
+        if 'target_instrumentalness' in data and data['target_instrumentalness'] is not None:
+            inst_delta = safe_float(data['target_instrumentalness']) - safe_float(data.get('original_instrumentalness', 0.5))
+            if inst_delta > 0.03:
+                # More instrumental -> cut midrange heavily
+                plugins.append(HighShelfFilter(cutoff_frequency_hz=1000, gain_db=-2.0))
+                plugins.append(LowShelfFilter(cutoff_frequency_hz=4000, gain_db=-2.0))
 
         if plugins:
             if PEDALBOARD_AVAILABLE:
